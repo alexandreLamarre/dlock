@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/etcd"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
+	"github.com/alexandreLamarre/dlock/pkg/test"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
 	"github.com/alexandreLamarre/dlock/pkg/util/future"
 	. "github.com/onsi/ginkgo/v2"
@@ -27,8 +27,11 @@ var lmSet = future.New[lo.Tuple3[
 
 var _ = BeforeSuite(func() {
 	if Label("integration").MatchesLabelFilter(GinkgoLabelFilter()) {
-		// TODO : set up etcd
-		conf := &v1alpha1.EtcdStorageSpec{}
+		env := test.Environment{}
+		Expect(env.Start()).To(Succeed())
+
+		conf, err := env.StartEtcd()
+		Expect(err).To(Succeed())
 
 		cli, err := etcd.NewEtcdClient(context.Background(), conf)
 		Expect(err).To(Succeed())
@@ -55,7 +58,7 @@ var _ = BeforeSuite(func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(err).To(Succeed())
-		// DeferCleanup(env.Stop, "Test Suite Finished")
+		DeferCleanup(env.Stop, "Test Suite Finished")
 	}
 })
 

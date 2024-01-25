@@ -7,7 +7,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -46,7 +45,7 @@ func (c *dlockClient) Lock(ctx context.Context, in *LockRequest, opts ...grpc.Ca
 }
 
 type Dlock_LockClient interface {
-	Recv() (*emptypb.Empty, error)
+	Recv() (*LockResponse, error)
 	grpc.ClientStream
 }
 
@@ -54,8 +53,8 @@ type dlockLockClient struct {
 	grpc.ClientStream
 }
 
-func (x *dlockLockClient) Recv() (*emptypb.Empty, error) {
-	m := new(emptypb.Empty)
+func (x *dlockLockClient) Recv() (*LockResponse, error) {
+	m := new(LockResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -97,7 +96,7 @@ func _Dlock_Lock_Handler(srv interface{}, stream grpc.ServerStream) error {
 }
 
 type Dlock_LockServer interface {
-	Send(*emptypb.Empty) error
+	Send(*LockResponse) error
 	grpc.ServerStream
 }
 
@@ -105,7 +104,7 @@ type dlockLockServer struct {
 	grpc.ServerStream
 }
 
-func (x *dlockLockServer) Send(m *emptypb.Empty) error {
+func (x *dlockLockServer) Send(m *LockResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 

@@ -18,12 +18,7 @@ func sanitizePrefix(prefix string) string {
 }
 
 func AcquireJetstreamConn(ctx context.Context, conf *v1alpha1.JetStreamStorageSpec, lg *slog.Logger) (nats.JetStreamContext, error) {
-	nkeyOpt, err := nats.NkeyOptionFromSeed(conf.NkeySeedPath)
-	if err != nil {
-		return nil, err
-	}
-	nc, err := nats.Connect(conf.Endpoint,
-		nkeyOpt,
+	options := []nats.Option{
 		nats.MaxReconnects(-1),
 		nats.RetryOnFailedConnect(true),
 		nats.DisconnectErrHandler(func(c *nats.Conn, err error) {
@@ -43,6 +38,13 @@ func AcquireJetstreamConn(ctx context.Context, conf *v1alpha1.JetStreamStorageSp
 				"version", c.ConnectedServerVersion(),
 			).Info("reconnected to jetstream")
 		}),
+	}
+	nkeyOpt, err := nats.NkeyOptionFromSeed(conf.NkeySeedPath)
+	if err == nil {
+		options = append(options, nkeyOpt)
+	}
+	nc, err := nats.Connect(conf.Endpoint,
+		options...,
 	)
 	if err != nil {
 		return nil, err

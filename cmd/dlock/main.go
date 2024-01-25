@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/server"
 	"github.com/spf13/cobra"
@@ -15,8 +17,10 @@ func BuildRootCmd() *cobra.Command {
 	var addr string
 	cmd := &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO : read config file path
-			lockServer := server.NewLockServer(logger.New())
+			if _, err := os.Stat(configPath); err != nil {
+				return err
+			}
+			lockServer := server.NewLockServer(cmd.Context(), logger.New(), configPath)
 			return lockServer.ListenAndServe(cmd.Context(), addr)
 		},
 	}

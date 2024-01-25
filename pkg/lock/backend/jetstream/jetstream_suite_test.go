@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/jetstream"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
+	"github.com/alexandreLamarre/dlock/pkg/test"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
 	"github.com/alexandreLamarre/dlock/pkg/util/future"
 	. "github.com/onsi/ginkgo/v2"
@@ -28,14 +28,18 @@ var lmSetF = future.New[lo.Tuple3[
 var _ = BeforeSuite(func() {
 	if Label("integration").MatchesLabelFilter(GinkgoLabelFilter()) {
 		// TODO : start jetstream
+		env := test.Environment{}
+		Expect(env.Start()).To(Succeed())
 
-		conf := &v1alpha1.JetStreamStorageSpec{}
+		conf, err := env.StartJetstream()
+		Expect(err).NotTo(HaveOccurred())
 
 		js, err := jetstream.AcquireJetstreamConn(
 			context.Background(),
 			conf,
 			logger.NewNop(),
 		)
+		Expect(err).NotTo(HaveOccurred())
 
 		lm := jetstream.NewLockManager(
 			context.Background(),
@@ -43,7 +47,6 @@ var _ = BeforeSuite(func() {
 			"test",
 			logger.New().WithGroup("js-lock"),
 		)
-		Expect(err).NotTo(HaveOccurred())
 		lmF.Set(lm)
 
 		js1, err := jetstream.AcquireJetstreamConn(

@@ -6,7 +6,19 @@ option go_package="github.com/alexandreLamarre/dlock/api/v1alpha1";
 package dlock;
 
 service Dlock {
-    rpc Lock(LockRequest) returns (stream google.protobuf.Empty) {};
+    rpc Lock(LockRequest) returns (stream LockResponse) {};
 }
 
-message LockRequest {}
+message LockRequest {
+    string key = 1;
+    bool tryLock = 2;
+}
+
+message LockResponse {
+    LockEvent event = 1;
+}
+
+enum LockEvent {
+    Acquired = 0;
+    Failed = 1;
+}
