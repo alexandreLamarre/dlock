@@ -1,0 +1,12 @@
+syntax="proto3";
+
+import "google/protobuf/empty.proto";
+option go_package="github.com/alexandreLamarre/dlock/api/v1alpha1";
+
+package dlock;
+
+service Dlock {
+    rpc Lock(LockRequest) returns (stream google.protobuf.Empty) {};
+}
+
+message LockRequest {}

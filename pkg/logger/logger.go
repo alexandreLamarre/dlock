@@ -3,6 +3,7 @@ package logger
 import (
 	"io"
 	"log/slog"
+	"os"
 	"time"
 )
 
@@ -12,7 +13,7 @@ const (
 
 var (
 	DefaultLogLevel   = slog.LevelDebug
-	DefaultWriter     io.Writer
+	DefaultWriter     = os.Stdout
 	DefaultAddSource  = true
 	pluginGroupPrefix = "plugin"
 	NoRepeatInterval  = 3600 * time.Hour // arbitrarily long time to denote one-time sampling
