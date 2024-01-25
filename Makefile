@@ -3,7 +3,7 @@
 
 GOCMD=go
 BINARY_NAME=dlock
-GO_BUILD_FLAGS=-v -o ./bin/$(BINARY_NAME)
+GO_BUILD_FLAGS=-o ./bin/$(BINARY_NAME)
 GOBUILD=$(GOCMD) build $(GO_BUILD_FLAGS) ./cmd/dlock 
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
