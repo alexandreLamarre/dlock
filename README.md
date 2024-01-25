@@ -1,6 +1,7 @@
 # Dlock
 
 ![Build](https://github.com/alexandreLamarre/dlock/actions/workflows/ci.yaml/badge.svg)
+![Release](https://img.shields.io/github/v/release/alexandreLamarre/dlock)
 
 Dlock is a server for distributed locking for process synchronization & exclusive transactions in distributed systems.
 
@@ -82,7 +83,7 @@ As apposed to standard single-host locking mechanisms, distributed locks can be 
 <tr>
 <th>EX
 </th>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
 <td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
 <td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
 <td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
