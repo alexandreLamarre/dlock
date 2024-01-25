@@ -22,3 +22,4 @@ go.work
 
 #output binaries
 bin/
+testbin/
