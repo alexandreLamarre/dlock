@@ -32,62 +32,62 @@ As apposed to standard single-host locking mechanisms, distributed locks can be 
 <tr>
 <th>NL
 </th>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:
 </td></tr>
 <tr>
 <th>CR
 </th>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:
 </td></tr>
 <tr>
 <th>CW
 </th>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:
 </td></tr>
 <tr>
 <th>PR
 </th>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:
 </td></tr>
 <tr>
 <th>PW
 </th>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">:white_check_mark:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:
 </td></tr>
 <tr>
 <th>EX
 </th>
 <td style="background:#087324;vertical-align:middle;text-align:center;" class="table-yes">Yes</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No</td>
-<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">No
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:</td>
+<td style="background:#ab0330;vertical-align:middle;text-align:center;" class="table-no">:x:
 </td></tr></tbody></table>
 
 ### Notes
@@ -106,12 +106,13 @@ As apposed to standard single-host locking mechanisms, distributed locks can be 
 
 ### Exclusive Locks (EX)
 
-**Liveliness A** : A lock is always eventually released when the process holding it crashes or exits unexpectedly.
+- **Liveliness A** : A lock is always eventually released when the process holding it crashes or exits unexpectedly.
 
-**Liveliness B** : A lock is always eventually released when its backend store is unavailable.
+- **Liveliness B** : A lock is always eventually released when its backend store is unavailable.
 
-**Atomicity A** : No two processes or threads can hold the same lock at the same time.
-**Atomicity B** : Any call to unlock will always eventually release the lock
+- **Atomicity A** : No two processes or threads can hold the same lock at the same time.
+
+-**Atomicity B** : Any call to unlock will always eventually release the lock
 
 ## References
 
