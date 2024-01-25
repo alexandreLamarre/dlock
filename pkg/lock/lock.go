@@ -1,6 +1,7 @@
 package lock
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"sync/atomic"
@@ -17,6 +18,38 @@ var (
 	DefaultAcquireTimeout = 100 * time.Millisecond
 	DefaultTimeout        = 10 * time.Second
 )
+
+// Lock is a distributed lock that can be used to coordinate access to a resource or interest in
+// such a resource.
+// Locks follow the following liveliness & atomicity guarantees to prevent distributed deadlocks
+// and guarantee atomicity in the critical section.
+//
+// Liveliness A :  A lock is always eventually released when the process holding it crashes or exits unexpectedly.
+// Liveliness B : A lock is always eventually released when its backend store is unavailable.
+// Atomicity A : No two processes or threads can hold the same lock at the same time.
+// Atomicity B : Any call to unlock will always eventually release the lock
+type Lock interface {
+	// Lock acquires a lock on the key. If the lock is already held, it will block until the lock is acquired or
+	// the context fails.
+	// Lock returns an error if the context expires or an unrecoverable error occurs when trying to acquire the lock.
+	Lock(ctx context.Context) (expired chan struct{}, err error)
+	// TryLock tries to acquire the lock on the key and reports whether it succeeded.
+	// It blocks until at least one attempt was made to acquired the lock, and returns acquired=false and no error
+	// if the lock is known to be held by someone else
+	TryLock(ctx context.Context) (acquired bool, expired chan struct{}, err error)
+	// Unlock releases the lock on the key in a non-blocking fashion.
+	// It spawns a goroutine that will perform the unlock mechanism until it succeeds or the the lock is
+	// expired by the server.
+	// It immediately signals to the lock's original expired channel that the lock is released.
+	Unlock() error
+}
+
+type LockManager interface {
+	// Instantiates a new Lock instance for the given key, with the given options.
+	//
+	// Defaults to lock.DefaultOptions if no options are provided.
+	NewLock(key string, opts ...LockOption) Lock
+}
 
 type LockScheduler struct {
 	cond      sync.Cond
