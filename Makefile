@@ -12,6 +12,12 @@ NATS_BIN=nats-server-$(NATS_VERSION)-$(GOOS)-$(GOARCH)
 ETCD_VERSION=v3.5.11
 ETCD_BIN=etcd-$(ETCD_VERSION)-$(GOOS)-$(GOARCH)
 
+install:
+	go install github.com/bufbuild/buf/cmd/buf@v1.29.0
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+	go install github.com/onsi/ginkgo/v2/ginkgo
+
 build: gen
 	$(GOBUILD) 
 gen:
