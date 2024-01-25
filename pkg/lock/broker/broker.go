@@ -12,11 +12,13 @@ import (
 
 func NewLockManager(ctx context.Context, lg *slog.Logger, config *v1alpha1.LockServerConfig) lock.LockManager {
 	if config.EtcdStorageSpec != nil {
-		return etcd.NewEtcdLockManager(nil, "lock", lg)
+		cli, _ := etcd.NewEtcdClient(ctx, config.EtcdStorageSpec)
+		return etcd.NewEtcdLockManager(cli, "lock", lg)
 	}
 
 	if config.JetStreamStorageSpec != nil {
-		return jetstream.NewLockManager(ctx, nil, "lock", lg)
+		cli, _ := jetstream.AcquireJetstreamConn(ctx, config.JetStreamStorageSpec, lg)
+		return jetstream.NewLockManager(ctx, cli, "lock", lg)
 	}
 
 	return nil

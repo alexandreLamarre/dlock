@@ -1,6 +1,13 @@
 name: Build & Test
 on:
-  push:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".gitignore"
+      - "CODEOWNERS"
+      - "LICENSE"
+      - "Makefile"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,7 +17,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@v4
         with:
-          go-version: ">=1.20.0"
+          go-version: ">=1.21.0"
       - name: Install
         run: make install
       - name: Build
