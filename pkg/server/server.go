@@ -14,7 +14,9 @@ import (
 	configv1alpha1 "github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
+	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
@@ -50,8 +52,11 @@ func NewLockServer(ctx context.Context, lg *slog.Logger, configPath string) *Loc
 var _ v1alpha1.DlockServer = &LockServer{}
 
 func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockServer) error {
+	lg := s.lg.With("key", in.Key, "block", !in.TryLock)
+	lg.Debug("received lock request")
 	if s.lm == nil {
-		return status.Errorf(codes.Unimplemented, "no lock backend")
+		s.lg.Error("no lock backend")
+		return status.Errorf(codes.Unavailable, "no lock backend")
 	}
 
 	if err := in.Validate(); err != nil {
@@ -63,10 +68,12 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 	if in.TryLock {
 		acquired, expired, err := locker.TryLock(stream.Context())
 		if err != nil {
+			lg.With(logger.Err(err)).Error("failed to acquire lock")
 			return status.Errorf(codes.Internal, err.Error())
 		}
 		expiredC = expired
 		if !acquired {
+			lg.Warn("failed to acquire non-blocking lock")
 			if err := stream.Send(&v1alpha1.LockResponse{
 				Event: v1alpha1.LockEvent_Failed,
 			}); err != nil {
@@ -77,11 +84,15 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 	} else {
 		expired, err := locker.Lock(stream.Context())
 		if err != nil {
+			lg.With(logger.Err(err)).Error("failed to acquire blocking lock", "key", in.Key)
 			return status.Errorf(codes.Internal, err.Error())
 		}
 		expiredC = expired
 	}
-	defer locker.Unlock()
+	defer func() {
+		lg.Debug("unlocking key")
+		locker.Unlock()
+	}()
 
 	if err := stream.Send(&v1alpha1.LockResponse{
 		Event: v1alpha1.LockEvent_Acquired,
@@ -91,13 +102,17 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 	var streamErr error
 	select {
 	case <-stream.Context().Done():
+		lg.Debug("lock request terminated due to stream context deadline", "key", in.Key)
 		streamErr = stream.Context().Err()
 	case <-expiredC:
+		lg.Warn("lock expired from storage backend")
 		streamErr = status.Error(codes.Canceled, "lock expired from storage backend") // fmt.Errorf("lock expired from storage backend")
 	}
 	if status.FromContextError(streamErr).Code() == codes.Canceled { //nolint
+		lg.Debug("lock cancelled normally")
 		return nil
 	}
+	lg.With(logger.Err(streamErr)).Debug("lock request cancelled")
 	return streamErr
 }
 
@@ -121,6 +136,7 @@ func (s *LockServer) ListenAndServe(ctx context.Context, addr string) error {
 			Time:    15 * time.Second,
 			Timeout: 5 * time.Second,
 		}),
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 	)
 	server.RegisterService(&v1alpha1.Dlock_ServiceDesc, s)
 	errC := lo.Async(func() error {

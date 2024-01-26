@@ -23,3 +23,7 @@ go.work
 #output binaries
 bin/
 testbin/
+
+# data directories
+
+default.etcd/
