@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/url"
 	"os/exec"
@@ -111,12 +113,20 @@ func BuildLockCmd() *cobra.Command {
 				defer ca()
 				for {
 					lg.Info("waiting to receive lock event")
+				RETRY:
 					resp, err := client.Recv()
 					lg.Info("received lock event")
 					if err != nil {
 						if st, ok := status.FromError(err); ok && st.Code() == codes.Canceled {
 							lg.Error("lock expired from remote backend")
+							break
 						}
+						if errors.Is(err, io.EOF) {
+							lg.Error("stream closed")
+							break
+						}
+						lg.Error("failed to receive lock event", "err", err)
+						goto RETRY
 					}
 					if resp.Event == v1alpha1.LockEvent_Acquired {
 						lg.Info("lock acquired")

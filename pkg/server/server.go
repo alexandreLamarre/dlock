@@ -31,12 +31,14 @@ type LockServer struct {
 	tracer trace.Tracer
 
 	lm lock.LockManager
+	LockServerMetrics
 }
 
-func NewLockServer(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, configPath string) *LockServer {
+func NewLockServer(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, configPath string, servermetrics *LockServerMetrics) *LockServer {
 	ls := &LockServer{
-		lg:     lg,
-		tracer: tracer,
+		lg:                lg,
+		tracer:            tracer,
+		LockServerMetrics: *servermetrics,
 	}
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
@@ -56,6 +58,7 @@ func NewLockServer(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, co
 var _ v1alpha1.DlockServer = &LockServer{}
 
 func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockServer) error {
+	s.LockServerMetrics.LockTotalRequestCount.Add(stream.Context(), 1)
 	ctx, span := s.tracer.Start(stream.Context(), "lock")
 	defer span.End()
 	lg := s.lg.With("key", in.Key, "block", !in.TryLock)
@@ -100,6 +103,8 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 		lg.Debug("unlocking key")
 		locker.Unlock()
 	}()
+
+	s.LockServerMetrics.LockAcquisitionCount.Add(stream.Context(), 1)
 
 	if err := stream.Send(&v1alpha1.LockResponse{
 		Event: v1alpha1.LockEvent_Acquired,
