@@ -1,17 +1,39 @@
 package main
 
 import (
+	"context"
+	"log"
 	"log/slog"
 	"os"
 
 	"github.com/alexandreLamarre/dlock/pkg/constants"
+	"github.com/alexandreLamarre/dlock/pkg/instrumentation"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/server"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func main() {
-	BuildRootCmd().Execute()
+	ctx := context.Background()
+
+	exp, err := instrumentation.NewTraceExporter(ctx)
+	if err != nil {
+		log.Fatalf("failed to initialize exporter: %v", err)
+	}
+
+	// Create a new tracer provider with a batch span processor and the given exporter.
+	tp := instrumentation.NewTracerProvider(exp)
+
+	// Handle shutdown properly so nothing leaks.
+	defer func() { _ = tp.Shutdown(ctx) }()
+
+	otel.SetTracerProvider(tp)
+
+	// Finally, set the tracer that can be used for this package.
+	tracer := tp.Tracer("ExampleService")
+	BuildRootCmd(tracer).Execute()
 }
 
 func logLevelFromString(level string) slog.Level {
@@ -29,7 +51,7 @@ func logLevelFromString(level string) slog.Level {
 	}
 }
 
-func BuildRootCmd() *cobra.Command {
+func BuildRootCmd(tracer trace.Tracer) *cobra.Command {
 	var configPath string
 	var addr string
 	var logLevel string
@@ -38,9 +60,14 @@ func BuildRootCmd() *cobra.Command {
 			if _, err := os.Stat(configPath); err != nil {
 				return err
 			}
-			lockServer := server.NewLockServer(cmd.Context(), logger.New(
-				logger.WithLogLevel(logLevelFromString(logLevel)),
-			), configPath)
+			lockServer := server.NewLockServer(
+				cmd.Context(),
+				tracer,
+				logger.New(
+					logger.WithLogLevel(logLevelFromString(logLevel)),
+				),
+				configPath,
+			)
 			return lockServer.ListenAndServe(cmd.Context(), addr)
 		},
 	}

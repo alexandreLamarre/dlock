@@ -27,3 +27,7 @@ testbin/
 # data directories
 
 default.etcd/
+
+# dev configs
+.vscode
+.idea

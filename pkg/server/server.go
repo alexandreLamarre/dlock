@@ -17,6 +17,7 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
@@ -24,15 +25,18 @@ import (
 )
 
 type LockServer struct {
-	lg *slog.Logger
 	v1alpha1.UnimplementedDlockServer
+
+	lg     *slog.Logger
+	tracer trace.Tracer
 
 	lm lock.LockManager
 }
 
-func NewLockServer(ctx context.Context, lg *slog.Logger, configPath string) *LockServer {
+func NewLockServer(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, configPath string) *LockServer {
 	ls := &LockServer{
-		lg: lg,
+		lg:     lg,
+		tracer: tracer,
 	}
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
@@ -44,7 +48,7 @@ func NewLockServer(ctx context.Context, lg *slog.Logger, configPath string) *Loc
 		lg.With("configPath", configPath).Error("failed to decode config file")
 		return ls
 	}
-	lm := broker.NewLockManager(ctx, lg, config)
+	lm := broker.NewLockManager(ctx, logger.NewNop(), config)
 	ls.lm = lm
 	return ls
 }
@@ -52,6 +56,8 @@ func NewLockServer(ctx context.Context, lg *slog.Logger, configPath string) *Loc
 var _ v1alpha1.DlockServer = &LockServer{}
 
 func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockServer) error {
+	ctx, span := s.tracer.Start(stream.Context(), "lock")
+	defer span.End()
 	lg := s.lg.With("key", in.Key, "block", !in.TryLock)
 	lg.Debug("received lock request")
 	if s.lm == nil {
@@ -66,7 +72,8 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 	locker := s.lm.NewLock(in.Key)
 	var expiredC <-chan struct{}
 	if in.TryLock {
-		acquired, expired, err := locker.TryLock(stream.Context())
+		span.AddEvent("try lock")
+		acquired, expired, err := locker.TryLock(ctx)
 		if err != nil {
 			lg.With(logger.Err(err)).Error("failed to acquire lock")
 			return status.Errorf(codes.Internal, err.Error())
@@ -82,7 +89,7 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 			return nil
 		}
 	} else {
-		expired, err := locker.Lock(stream.Context())
+		expired, err := locker.Lock(ctx)
 		if err != nil {
 			lg.With(logger.Err(err)).Error("failed to acquire blocking lock", "key", in.Key)
 			return status.Errorf(codes.Internal, err.Error())
