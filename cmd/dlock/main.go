@@ -57,15 +57,14 @@ func BuildRootCmd(tracer trace.Tracer) *cobra.Command {
 				return err
 			}
 			metricsServer := instrumentation.NewMetricsServer(metricsAddr)
-			servermetrics := server.NewLockServerMetrics(metricsServer.Provider())
 			lockServer := server.NewLockServer(
 				cmd.Context(),
 				tracer,
+				metricsServer.Provider(),
 				logger.New(
 					logger.WithLogLevel(logLevelFromString(logLevel)),
 				),
 				configPath,
-				servermetrics,
 			)
 			e1 := lo.Async(func() error {
 				return lockServer.ListenAndServe(cmd.Context(), addr)

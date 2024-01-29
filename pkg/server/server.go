@@ -18,6 +18,7 @@ import (
 	"github.com/samber/lo"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/attribute"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -32,15 +33,20 @@ type LockServer struct {
 	tracer trace.Tracer
 
 	lm lock.LockManager
-	LockServerMetrics
 }
 
-func NewLockServer(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, configPath string, servermetrics *LockServerMetrics) *LockServer {
+func NewLockServer(
+	ctx context.Context,
+	tracer trace.Tracer,
+	metric *sdkmetric.MeterProvider,
+	lg *slog.Logger,
+	configPath string,
+) *LockServer {
 	ls := &LockServer{
-		lg:                lg,
-		tracer:            tracer,
-		LockServerMetrics: *servermetrics,
+		lg:     lg,
+		tracer: tracer,
 	}
+	RegisterMeterProvider(metric)
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
 		lg.With("configPath", configPath).Error("failed to read config file")
@@ -59,8 +65,7 @@ func NewLockServer(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, co
 var _ v1alpha1.DlockServer = &LockServer{}
 
 func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockServer) error {
-	s.LockServerMetrics.LockTotalRequestCount.Add(stream.Context(), 1)
-
+	LockRequestCount.Add(stream.Context(), 1)
 	lg := s.lg.With("key", in.Key, "block", !in.TryLock)
 	lg.Debug("received lock request")
 	if s.lm == nil {
@@ -115,13 +120,12 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 		expiredC = expired
 	}
 	lockSpan.End()
-
 	defer func() {
 		lg.Debug("unlocking key")
 		locker.Unlock()
 	}()
-
-	s.LockServerMetrics.LockAcquisitionCount.Add(stream.Context(), 1)
+	LockAcquisitionCount.Add(stream.Context(), 1)
+	lockHoldStart := time.Now()
 	lg.Debug("acquired lock")
 	if err := stream.Send(&v1alpha1.LockResponse{
 		Event: v1alpha1.LockEvent_Acquired,
@@ -133,15 +137,19 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 	case <-stream.Context().Done():
 		lg.Debug("lock request terminated due to stream context deadline", "key", in.Key)
 		streamErr = stream.Context().Err()
+		if status.FromContextError(streamErr).Code() == codes.Canceled { //nolint
+			lg.Debug("lock cancelled normally")
+			streamErr = nil
+		}
 	case <-expiredC:
 		lg.Warn("lock expired from storage backend")
-		return status.Error(codes.Canceled, "lock expired from storage backend") // fmt.Errorf("lock expired from storage backend")
+		streamErr = status.Error(codes.Canceled, "lock expired from storage backend") // fmt.Errorf("lock expired from storage backend")
 	}
-	if status.FromContextError(streamErr).Code() == codes.Canceled { //nolint
-		lg.Debug("lock cancelled normally")
-		return nil
+	lockHoldDur := time.Since(lockHoldStart)
+	LockHeldTime.Record(stream.Context(), float64(lockHoldDur.Milliseconds()))
+	if streamErr != nil {
+		lg.With(logger.Err(streamErr)).Error("lock request cancelled")
 	}
-	lg.With(logger.Err(streamErr)).Error("lock request cancelled")
 	return streamErr
 }
 
