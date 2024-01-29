@@ -17,7 +17,7 @@ func sanitizePrefix(prefix string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(prefix, "/", "-"), ".", "_")
 }
 
-func AcquireJetstreamConn(ctx context.Context, conf *v1alpha1.JetStreamStorageSpec, lg *slog.Logger) (nats.JetStreamContext, error) {
+func AcquireJetstreamConn(ctx context.Context, conf *v1alpha1.JetstreamClientSpec, lg *slog.Logger) (nats.JetStreamContext, error) {
 	options := []nats.Option{
 		nats.MaxReconnects(-1),
 		nats.RetryOnFailedConnect(true),

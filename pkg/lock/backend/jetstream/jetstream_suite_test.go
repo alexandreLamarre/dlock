@@ -45,7 +45,7 @@ var _ = BeforeSuite(func() {
 			js,
 			"test",
 			nil,
-			logger.New().WithGroup("js-lock"),
+			logger.NewNop(),
 		)
 		lmF.Set(lm)
 
@@ -66,13 +66,13 @@ var _ = BeforeSuite(func() {
 		js3, err := jetstream.AcquireJetstreamConn(
 			context.Background(),
 			conf,
-			logger.New(),
+			logger.NewNop(),
 		)
 		Expect(err).NotTo(HaveOccurred())
 
-		x := jetstream.NewLockManager(context.Background(), js1, "test", nil, logger.New())
-		y := jetstream.NewLockManager(context.Background(), js2, "test", nil, logger.New())
-		z := jetstream.NewLockManager(context.Background(), js3, "test", nil, logger.New())
+		x := jetstream.NewLockManager(context.Background(), js1, "test", nil, logger.NewNop())
+		y := jetstream.NewLockManager(context.Background(), js2, "test", nil, logger.NewNop())
+		z := jetstream.NewLockManager(context.Background(), js3, "test", nil, logger.NewNop())
 
 		lmSetF.Set(lo.Tuple3[lock.LockManager, lock.LockManager, lock.LockManager]{
 			A: x, B: y, C: z,

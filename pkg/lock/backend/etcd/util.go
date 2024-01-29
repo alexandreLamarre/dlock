@@ -10,7 +10,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-func NewEtcdClient(ctx context.Context, conf *v1alpha1.EtcdStorageSpec) (*clientv3.Client, error) {
+func NewEtcdClient(ctx context.Context, conf *v1alpha1.EtcdClientSpec) (*clientv3.Client, error) {
 	var tlsConfig *tls.Config
 	if conf.Certs != nil {
 		var err error

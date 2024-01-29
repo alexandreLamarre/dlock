@@ -16,7 +16,7 @@
 ## Backends
 
 - [ ] Filesystem-based distributed locks using `flock`
-- [ ] Redis support
+- [x] Redis support
 - [ ] Embedded raft / mini-raft support
 
 ## Testing
@@ -27,4 +27,4 @@
 ## Miscellaneous
 
 - [ ] Examples folder for distributed lock usecases
-- [ ] Internal metrics & traces
+- [x] Server & internal metrics & traces instrumentation

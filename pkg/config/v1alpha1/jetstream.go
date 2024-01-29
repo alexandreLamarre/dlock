@@ -1,6 +1,6 @@
 package v1alpha1
 
-type JetStreamStorageSpec struct {
+type JetstreamClientSpec struct {
 	Endpoint     string `json:"endpoint,omitempty"`
 	NkeySeedPath string `json:"nkeySeedPath,omitempty"`
 }
