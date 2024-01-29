@@ -61,9 +61,6 @@ func (e *Environment) Stop(cause ...string) error {
 		e.Logger.Info("Stopping test environment")
 	}
 
-	os.Unsetenv("NATS_SERVER_URL")
-	os.Unsetenv("NKEY_SEED_FILENAME")
-
 	if e.cancel != nil {
 		e.cancel()
 		var wg sync.WaitGroup
@@ -144,6 +141,7 @@ func (e *Environment) StartRedis() ([]*goredislib.Options, error) {
 	e.addShutdownHook(func() {
 		server.Term()
 	})
+	e.Logger.Info("Redis server started", "socket", server.Socket())
 	return []*goredislib.Options{
 		{
 			Network: "unix",
@@ -152,7 +150,7 @@ func (e *Environment) StartRedis() ([]*goredislib.Options, error) {
 }
 
 // FIXME: set the ports to freeports
-func (e *Environment) StartEtcd() (*v1alpha1.EtcdStorageSpec, error) {
+func (e *Environment) StartEtcd() (*v1alpha1.EtcdClientSpec, error) {
 	conf := etcdserver.NewConfig()
 	if err := conf.Validate(); err != nil {
 		panic(err)
@@ -172,12 +170,13 @@ func (e *Environment) StartEtcd() (*v1alpha1.EtcdStorageSpec, error) {
 	e.addShutdownHook(func() {
 		server.Close()
 	})
-	return &v1alpha1.EtcdStorageSpec{
+	e.Logger.Info("Etcd server started", "endpoints", etcdserver.DefaultAdvertiseClientURLs)
+	return &v1alpha1.EtcdClientSpec{
 		Endpoints: []string{etcdserver.DefaultAdvertiseClientURLs},
 	}, nil
 }
 
-func (e *Environment) StartJetstream() (*v1alpha1.JetStreamStorageSpec, error) {
+func (e *Environment) StartJetstream() (*v1alpha1.JetstreamClientSpec, error) {
 	ports := freeport.GetFreePorts(1)
 
 	opts := natstest.DefaultTestOptions
@@ -193,13 +192,10 @@ func (e *Environment) StartJetstream() (*v1alpha1.JetStreamStorageSpec, error) {
 	if !e.embeddedJS.ReadyForConnections(2 * time.Second) {
 		return nil, errors.New("starting nats server: timeout")
 	}
+	e.Logger.Info("Jetstream server started", "port", ports[0])
 
 	sUrl := fmt.Sprintf("nats://127.0.0.1:%d", ports[0])
-	return &v1alpha1.JetStreamStorageSpec{
+	return &v1alpha1.JetstreamClientSpec{
 		Endpoint: sUrl,
 	}, nil
-}
-
-func StartEtcd() *v1alpha1.EtcdStorageSpec {
-	return &v1alpha1.EtcdStorageSpec{}
 }

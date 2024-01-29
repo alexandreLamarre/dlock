@@ -1,6 +1,6 @@
 package v1alpha1
 
-type EtcdStorageSpec struct {
+type EtcdClientSpec struct {
 	// List of etcd endpoints to connect to.
 	Endpoints []string `json:"endpoints,omitempty"`
 	// Configuration for etcd client-cert auth.

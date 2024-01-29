@@ -1,8 +1,9 @@
 package v1alpha1
 
 type LockServerConfig struct {
-	EtcdStorageSpec      *EtcdStorageSpec      `json:"etcd,omitempty"`
-	JetStreamStorageSpec *JetStreamStorageSpec `json:"jetstream,omitempty"`
+	EtcdClientSpec      *EtcdClientSpec      `json:"etcd,omitempty"`
+	JetstreamClientSpec *JetstreamClientSpec `json:"jetstream,omitempty"`
+	RedisClientSpec     *RedisClientSpec     `json:"redis,omitempty"`
 }
 
 type TracesConfig struct {
