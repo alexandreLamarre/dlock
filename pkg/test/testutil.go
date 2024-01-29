@@ -134,7 +134,10 @@ func StartCmd(cmd *exec.Cmd) (Session, error) {
 }
 
 func (e *Environment) StartRedis() ([]*goredislib.Options, error) {
-	server, err := tempredis.Start(tempredis.Config{}, tempredis.WithWriter(ginkgo.GinkgoWriter))
+	server, err := tempredis.Start(
+		tempredis.Config{},
+		tempredis.WithWriter(ginkgo.GinkgoWriter),
+	)
 	if err != nil {
 		return nil, err
 	}
