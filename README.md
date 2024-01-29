@@ -102,6 +102,7 @@ As apposed to standard single-host locking mechanisms, distributed locks can be 
 | :-------------------------------------------------------: | :----------------: | :-: | :-: | :-: | :-: | :-: |
 | [Jetstream](https://docs.nats.io/nats-concepts/jetstream) | :white_check_mark: | :x: | :x: | :x: | :x: | :x: |
 |                 [Etcd ](https://etcd.io/)                 | :white_check_mark: | :x: | :x: | :x: | :x: | :x: |
+|                [Redis ](https://redis.io/)                | :white_check_mark: | :x: | :x: | :x: | :x: | :x: |
 
 ## Dlock specific guarantees
 
@@ -119,3 +120,4 @@ As apposed to standard single-host locking mechanisms, distributed locks can be 
 
 - [Distributed Lock Manager](https://en.wikipedia.org/wiki/Distributed_lock_manager). (n.d.). In Wikipedia. Retrieved from https://en.wikipedia.org/wiki/Distributed_lock_manager
 - Kleppmann, Martin. "Designing Data-Intensive Applications." (2019).
+- [Redis redlock algorithm](https://redis.io/docs/manual/patterns/distributed-locks/) from https://redis.io/docs/manual/patterns/distributed-locks/
