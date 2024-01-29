@@ -28,6 +28,7 @@ import (
 
 type LockServer struct {
 	v1alpha1.UnimplementedDlockServer
+	v1alpha1.UnimplementedSemaphoreServer
 
 	lg     *slog.Logger
 	tracer trace.Tracer

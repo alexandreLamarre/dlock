@@ -9,6 +9,12 @@ service Dlock {
     rpc Lock(LockRequest) returns (stream LockResponse) {};
 }
 
+service Semaphore {
+    rpc CreateSemaphore(google.protobuf.Empty) returns (google.protobuf.Empty) {};
+    rpc DeleteSemaphore(google.protobuf.Empty) returns (google.protobuf.Empty) {};
+    rpc Acquire(SemaphoreRequest) returns (stream SemaphoreResponse) {};
+}
+
 message LockRequest {
     string key = 1;
     bool tryLock = 2;
@@ -21,4 +27,16 @@ message LockResponse {
 enum LockEvent {
     Acquired = 0;
     Failed = 1;
+}
+
+message SemaphoreRequest {
+    string key = 1;
+    bool tryLock = 2;
+    int32 weight = 3;
+}
+
+message SemaphoreResponse {
+    LockEvent event = 1;
+    int32 load = 2;
+    int32 capacity = 3;
 }

@@ -46,11 +46,31 @@ type Lock interface {
 	Unlock() error
 }
 
+type WeightedSemaphore interface {
+	// Acquire acquires a weighted semaphore with the given weight. If no such semaphore exists already,
+	// bootstrap a semaphore with the given capacity. It blocks until the semaphore is acquired.
+	// It returns a channel that sends the weight of the semaphore when it expires.
+	Acquire(ctx context.Context) (expired <-chan int, err error)
+	// TryAcquire tries to acquire a weighted semaphore with the given weight. If no such semaphore exists already,
+	// bootstrap a semaphore with the given capacity.
+	// It blocks until at least one attempt was made to acquire the lock and reports whether or not it succeeded.
+	// It reports a acquired=false if the requested weight can not be added to the semaphore.
+	TryAcquire(ctx context.Context) (acquired bool, expired <-chan int, err error)
+	// Release releases the semaphore with the given weight.
+	Release() error
+}
+
 type LockManager interface {
 	// Instantiates a new Lock instance for the given key, with the given options.
 	//
 	// Defaults to lock.DefaultOptions if no options are provided.
 	NewLock(key string, opts ...LockOption) Lock
+}
+
+type SemaphoreManager interface {
+	CreateWeightedSemaphore(key string, capacity int) error
+	DeleteWeightedSemaphore(key string) error
+	NewWeightedSemaphore(key string, weight int) WeightedSemaphore
 }
 
 type LockScheduler struct {

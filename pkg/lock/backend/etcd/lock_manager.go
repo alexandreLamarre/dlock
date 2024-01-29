@@ -17,6 +17,8 @@ type EtcdLockManager struct {
 	lg *slog.Logger
 }
 
+var _ lock.LockManager = &EtcdLockManager{}
+
 func NewEtcdLockManager(
 	client *clientv3.Client,
 	prefix string,

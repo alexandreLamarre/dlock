@@ -20,6 +20,8 @@ type LockManager struct {
 	prefix string
 }
 
+var _ lock.LockManager = (*LockManager)(nil)
+
 func NewLockManager(
 	ctx context.Context,
 	js nats.JetStreamContext,
@@ -36,8 +38,6 @@ func NewLockManager(
 		tracer: tracer,
 	}
 }
-
-var _ lock.LockManager = (*LockManager)(nil)
 
 func (l *LockManager) NewLock(key string, opts ...lock.LockOption) lock.Lock {
 	options := lock.DefaultLockOptions()

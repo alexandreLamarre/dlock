@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -123,6 +124,190 @@ var Dlock_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Lock",
 			Handler:       _Dlock_Lock_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "api/v1alpha1/dlock.proto",
+}
+
+// SemaphoreClient is the client API for Semaphore service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SemaphoreClient interface {
+	CreateSemaphore(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteSemaphore(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Acquire(ctx context.Context, in *SemaphoreRequest, opts ...grpc.CallOption) (Semaphore_AcquireClient, error)
+}
+
+type semaphoreClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSemaphoreClient(cc grpc.ClientConnInterface) SemaphoreClient {
+	return &semaphoreClient{cc}
+}
+
+func (c *semaphoreClient) CreateSemaphore(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/dlock.Semaphore/CreateSemaphore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *semaphoreClient) DeleteSemaphore(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/dlock.Semaphore/DeleteSemaphore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *semaphoreClient) Acquire(ctx context.Context, in *SemaphoreRequest, opts ...grpc.CallOption) (Semaphore_AcquireClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Semaphore_ServiceDesc.Streams[0], "/dlock.Semaphore/Acquire", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &semaphoreAcquireClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Semaphore_AcquireClient interface {
+	Recv() (*SemaphoreResponse, error)
+	grpc.ClientStream
+}
+
+type semaphoreAcquireClient struct {
+	grpc.ClientStream
+}
+
+func (x *semaphoreAcquireClient) Recv() (*SemaphoreResponse, error) {
+	m := new(SemaphoreResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// SemaphoreServer is the server API for Semaphore service.
+// All implementations should embed UnimplementedSemaphoreServer
+// for forward compatibility
+type SemaphoreServer interface {
+	CreateSemaphore(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	DeleteSemaphore(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	Acquire(*SemaphoreRequest, Semaphore_AcquireServer) error
+}
+
+// UnimplementedSemaphoreServer should be embedded to have forward compatible implementations.
+type UnimplementedSemaphoreServer struct {
+}
+
+func (UnimplementedSemaphoreServer) CreateSemaphore(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSemaphore not implemented")
+}
+func (UnimplementedSemaphoreServer) DeleteSemaphore(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSemaphore not implemented")
+}
+func (UnimplementedSemaphoreServer) Acquire(*SemaphoreRequest, Semaphore_AcquireServer) error {
+	return status.Errorf(codes.Unimplemented, "method Acquire not implemented")
+}
+
+// UnsafeSemaphoreServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SemaphoreServer will
+// result in compilation errors.
+type UnsafeSemaphoreServer interface {
+	mustEmbedUnimplementedSemaphoreServer()
+}
+
+func RegisterSemaphoreServer(s grpc.ServiceRegistrar, srv SemaphoreServer) {
+	s.RegisterService(&Semaphore_ServiceDesc, srv)
+}
+
+func _Semaphore_CreateSemaphore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SemaphoreServer).CreateSemaphore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dlock.Semaphore/CreateSemaphore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SemaphoreServer).CreateSemaphore(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Semaphore_DeleteSemaphore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SemaphoreServer).DeleteSemaphore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dlock.Semaphore/DeleteSemaphore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SemaphoreServer).DeleteSemaphore(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Semaphore_Acquire_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(SemaphoreRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(SemaphoreServer).Acquire(m, &semaphoreAcquireServer{stream})
+}
+
+type Semaphore_AcquireServer interface {
+	Send(*SemaphoreResponse) error
+	grpc.ServerStream
+}
+
+type semaphoreAcquireServer struct {
+	grpc.ServerStream
+}
+
+func (x *semaphoreAcquireServer) Send(m *SemaphoreResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+// Semaphore_ServiceDesc is the grpc.ServiceDesc for Semaphore service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Semaphore_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dlock.Semaphore",
+	HandlerType: (*SemaphoreServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateSemaphore",
+			Handler:    _Semaphore_CreateSemaphore_Handler,
+		},
+		{
+			MethodName: "DeleteSemaphore",
+			Handler:    _Semaphore_DeleteSemaphore_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Acquire",
+			Handler:       _Semaphore_Acquire_Handler,
 			ServerStreams: true,
 		},
 	},
