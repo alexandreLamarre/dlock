@@ -8,17 +8,25 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/etcd"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/jetstream"
+	"github.com/alexandreLamarre/dlock/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 )
 
-func NewLockManager(ctx context.Context, lg *slog.Logger, config *v1alpha1.LockServerConfig) lock.LockManager {
+func NewLockManager(ctx context.Context, tracer trace.Tracer, lg *slog.Logger, config *v1alpha1.LockServerConfig) lock.LockManager {
 	if config.EtcdStorageSpec != nil {
-		cli, _ := etcd.NewEtcdClient(ctx, config.EtcdStorageSpec)
-		return etcd.NewEtcdLockManager(cli, "lock", lg)
+		cli, err := etcd.NewEtcdClient(ctx, config.EtcdStorageSpec)
+		if err != nil {
+			lg.With(logger.Err(err)).Warn("failed to acquired etcd client")
+		}
+		return etcd.NewEtcdLockManager(cli, "lock", tracer, lg)
 	}
 
 	if config.JetStreamStorageSpec != nil {
-		cli, _ := jetstream.AcquireJetstreamConn(ctx, config.JetStreamStorageSpec, lg)
-		return jetstream.NewLockManager(ctx, cli, "lock", lg)
+		cli, err := jetstream.AcquireJetstreamConn(ctx, config.JetStreamStorageSpec, lg)
+		if err != nil {
+			lg.With(logger.Err(err)).Warn("failed to acquired jetstream client")
+		}
+		return jetstream.NewLockManager(ctx, cli, "lock", tracer, lg)
 	}
 
 	return nil

@@ -7,8 +7,11 @@ import (
 	"path"
 	"time"
 
+	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/samber/lo"
 	"go.etcd.io/etcd/client/v3/concurrency"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // encapsulates stateful information and tasks requried for holding a lock
@@ -23,12 +26,14 @@ type etcdMutex struct {
 	mutex *concurrency.Mutex
 
 	internalDone chan struct{}
+	*lock.LockOptions
 }
 
 func NewEtcdMutex(
 	lg *slog.Logger,
 	prefix, key string,
 	session *concurrency.Session,
+	opts *lock.LockOptions,
 ) etcdMutex {
 	return etcdMutex{
 		lg:      lg,
@@ -38,6 +43,7 @@ func NewEtcdMutex(
 		prefix: prefix,
 		// mu:           sync.Mutex{},
 		internalDone: make(chan struct{}),
+		LockOptions:  opts,
 	}
 }
 
@@ -92,19 +98,35 @@ func (e *etcdMutex) teardown() {
 // which delegates unlock the key to the KV server-side,
 // giving the guarantee that unlock always actually unlocks when called
 func (e *etcdMutex) unlock() error {
-	if e.mutex == nil {
-		return errors.New("mutex not acquired")
+	var span trace.Span
+	ctx := context.Background()
+	if e.Tracer != nil {
+		ctxSpan, span := e.Tracer.Start(ctx, "Lock/etcd-unlock", trace.WithAttributes(
+			attribute.KeyValue{
+				Key:   "key",
+				Value: attribute.StringValue(e.key),
+			},
+		))
+		defer span.End()
+		ctx = ctxSpan
 	}
-
+	if e.mutex == nil {
+		err := errors.New("mutex not acquired")
+		if span != nil {
+			span.RecordError(err)
+		}
+		return err
+	}
 	defer e.teardown()
 
 	mutex := *e.mutex
 	e.mutex = nil
 	go func() {
-		ctxca, ca := context.WithTimeout(context.Background(), 60*time.Second)
+		ctxca, ca := context.WithTimeout(ctx, 60*time.Second)
 		defer ca()
 		if err := mutex.Unlock(ctxca); err != nil {
 			e.lg.Warn("failed to unlock mutex", "err", err.Error())
+			span.RecordError(err)
 		}
 	}()
 	return nil

@@ -2,9 +2,9 @@
 .PHONY: testbin
 
 GOCMD=go
-BINARY_NAME=dlock
-GO_BUILD_FLAGS=-o ./bin/$(BINARY_NAME)
-GOBUILD=$(GOCMD) build $(GO_BUILD_FLAGS) ./cmd/dlock 
+GO_BUILD_FLAGS=
+GOBUILDSERVER=$(GOCMD) build $(GO_BUILD_FLAGS) -o ./bin/dlock ./cmd/dlock 
+GOBUILDCLI=$(GOCMD) build $(GO_BUILD_FLAGS) -o ./bin/dlockctl ./cmd/dlockctl
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 NATS_VERSION=v2.10.9
@@ -19,7 +19,9 @@ install:
 	go install github.com/onsi/ginkgo/v2/ginkgo
 
 build: gen
-	$(GOBUILD) 
+	$(GOBUILDSERVER) 
+	$(GOBUILDCLI) 
+
 gen:
 	buf generate
 run: build

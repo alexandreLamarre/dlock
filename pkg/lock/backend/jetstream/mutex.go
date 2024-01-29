@@ -7,10 +7,13 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func newLease(key string) *nats.StreamConfig {
@@ -41,12 +44,15 @@ type jetstreamMutex struct {
 	sub          *nats.Subscription
 	internalDone chan struct{}
 	retDone      chan struct{}
+
+	*lock.LockOptions
 }
 
 func newJetstreamMutex(
 	lg *slog.Logger,
 	js nats.JetStreamContext,
 	prefix, key string,
+	opts *lock.LockOptions,
 ) jetstreamMutex {
 	uuid := uuid.New().String()
 	return jetstreamMutex{
@@ -58,6 +64,7 @@ func newJetstreamMutex(
 		msgQ:         make(chan *nats.Msg, 16),
 		internalDone: make(chan struct{}),
 		retDone:      make(chan struct{}),
+		LockOptions:  opts,
 	}
 }
 
@@ -142,7 +149,19 @@ func (j *jetstreamMutex) tryUnlock() error {
 // giving the guarantee that unlock always actually unlocks when called
 func (j *jetstreamMutex) unlock() error {
 	defer j.teardown()
-	ctx, ca := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx := context.Background()
+	var span trace.Span
+	if j.Tracer != nil {
+		ctx, span = j.Tracer.Start(context.Background(), "Unlock/jetstream-unlock", trace.WithAttributes(
+			attribute.KeyValue{
+				Key:   "key",
+				Value: attribute.StringValue(j.Key()),
+			},
+		))
+		defer span.End()
+	}
+
+	ctx, ca := context.WithTimeout(ctx, 60*time.Second)
 	defer ca()
 	tTicker := time.NewTicker(LockRetryDelay)
 	defer tTicker.Stop()
@@ -160,8 +179,15 @@ func (j *jetstreamMutex) unlock() error {
 				return nil
 			}
 			j.lg.Warn(fmt.Sprintf("failed to unlock : %s, retrying...", err.Error()))
+			if span != nil {
+				span.RecordError(err)
+			}
 		case <-ctx.Done():
-			return ctx.Err()
+			err := ctx.Err()
+			if span != nil {
+				span.RecordError(err)
+			}
+			return err
 		}
 	}
 }

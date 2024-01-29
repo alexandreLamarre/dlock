@@ -5,11 +5,14 @@ import (
 
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type EtcdLockManager struct {
 	client *clientv3.Client
 	prefix string
+
+	tracer trace.Tracer
 
 	lg *slog.Logger
 }
@@ -17,11 +20,13 @@ type EtcdLockManager struct {
 func NewEtcdLockManager(
 	client *clientv3.Client,
 	prefix string,
+	tracer trace.Tracer,
 	lg *slog.Logger,
 ) *EtcdLockManager {
 	lm := &EtcdLockManager{
 		client: client,
 		prefix: prefix,
+		tracer: tracer,
 		lg:     lg,
 	}
 	return lm
@@ -35,7 +40,6 @@ func NewEtcdLockManager(
 func (e *EtcdLockManager) NewLock(key string, opts ...lock.LockOption) lock.Lock {
 	options := lock.DefaultLockOptions()
 	options.Apply(opts...)
-
 	return NewEtcdLock(
 		e.lg,
 		e.client,

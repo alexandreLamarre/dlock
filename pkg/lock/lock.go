@@ -6,6 +6,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -121,7 +123,9 @@ func (o *OnceErr) doSlow(f func() error) error {
 	return nil
 }
 
-type LockOptions struct{}
+type LockOptions struct {
+	Tracer trace.Tracer
+}
 
 func DefaultLockOptions() *LockOptions {
 	return &LockOptions{}
@@ -134,3 +138,9 @@ func (o *LockOptions) Apply(opts ...LockOption) {
 }
 
 type LockOption func(o *LockOptions)
+
+func WithTracer(tracer trace.Tracer) LockOption {
+	return func(o *LockOptions) {
+		o.Tracer = tracer
+	}
+}

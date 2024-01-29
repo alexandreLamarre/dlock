@@ -36,21 +36,21 @@ var _ = BeforeSuite(func() {
 		cli, err := etcd.NewEtcdClient(context.Background(), conf)
 		Expect(err).To(Succeed())
 
-		lm := etcd.NewEtcdLockManager(cli, "test", logger.NewNop())
+		lm := etcd.NewEtcdLockManager(cli, "test", nil, logger.NewNop())
 		lmF.Set(lm)
 
 		x, err := etcd.NewEtcdClient(context.Background(), conf)
 		Expect(err).To(Succeed())
-		lmX := etcd.NewEtcdLockManager(x, "test", logger.NewNop())
+		lmX := etcd.NewEtcdLockManager(x, "test", nil, logger.NewNop())
 
 		y, err := etcd.NewEtcdClient(context.Background(), conf)
 		Expect(err).To(Succeed())
-		lmY := etcd.NewEtcdLockManager(y, "test", logger.NewNop())
+		lmY := etcd.NewEtcdLockManager(y, "test", nil, logger.NewNop())
 		Expect(err).To(Succeed())
 
 		z, err := etcd.NewEtcdClient(context.Background(), conf)
 		Expect(err).To(Succeed())
-		lmZ := etcd.NewEtcdLockManager(z, "test", logger.NewNop())
+		lmZ := etcd.NewEtcdLockManager(z, "test", nil, logger.NewNop())
 
 		lmSet.Set(lo.Tuple3[lock.LockManager, lock.LockManager, lock.LockManager]{
 			A: lmX, B: lmY, C: lmZ,

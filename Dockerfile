@@ -22,6 +22,8 @@ RUN make build
 FROM ubuntu:22.04
 
 COPY --from=builder /usr/src/app/bin/dlock /usr/local/bin/dlock
+COPY --from=builder /usr/src/app/bin/dlockctl /usr/local/bin/dlockctl
+RUN export PATH=$PATH:/usr/local/bin/dlockctl
 RUN chmod +x /usr/local/bin/dlock
 
 EXPOSE 5055
