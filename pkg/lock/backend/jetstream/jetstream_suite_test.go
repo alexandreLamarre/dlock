@@ -27,7 +27,6 @@ var lmSetF = future.New[lo.Tuple3[
 
 var _ = BeforeSuite(func() {
 	if Label("integration").MatchesLabelFilter(GinkgoLabelFilter()) {
-		// TODO : start jetstream
 		env := test.Environment{}
 		Expect(env.Start()).To(Succeed())
 
@@ -45,6 +44,7 @@ var _ = BeforeSuite(func() {
 			context.Background(),
 			js,
 			"test",
+			nil,
 			logger.New().WithGroup("js-lock"),
 		)
 		lmF.Set(lm)
@@ -70,14 +70,14 @@ var _ = BeforeSuite(func() {
 		)
 		Expect(err).NotTo(HaveOccurred())
 
-		x := jetstream.NewLockManager(context.Background(), js1, "test", logger.New())
-		y := jetstream.NewLockManager(context.Background(), js2, "test", logger.New())
-		z := jetstream.NewLockManager(context.Background(), js3, "test", logger.New())
+		x := jetstream.NewLockManager(context.Background(), js1, "test", nil, logger.New())
+		y := jetstream.NewLockManager(context.Background(), js2, "test", nil, logger.New())
+		z := jetstream.NewLockManager(context.Background(), js3, "test", nil, logger.New())
 
 		lmSetF.Set(lo.Tuple3[lock.LockManager, lock.LockManager, lock.LockManager]{
 			A: x, B: y, C: z,
 		})
-		// DeferCleanup(env.Stop, "Test Suite Finished")
+		DeferCleanup(env.Stop, "Test Suite Finished")
 	}
 })
 

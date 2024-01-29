@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"log/slog"
 	"os"
 
@@ -20,21 +19,14 @@ import (
 func main() {
 	ctx := context.Background()
 
-	exp, err := instrumentation.NewTraceExporter(ctx)
-	if err != nil {
-		log.Fatalf("failed to initialize exporter: %v", err)
-	}
-
-	// Create a new tracer provider with a batch span processor and the given exporter.
-	tp := instrumentation.NewTracerProvider(exp)
+	tp := instrumentation.NewTracerProvider()
 
 	// Handle shutdown properly so nothing leaks.
 	defer func() { _ = tp.Shutdown(ctx) }()
 
 	otel.SetTracerProvider(tp)
 
-	// Finally, set the tracer that can be used for this package.
-	tracer := tp.Tracer("ExampleService")
+	tracer := tp.Tracer("dlock")
 	BuildRootCmd(tracer).Execute()
 }
 

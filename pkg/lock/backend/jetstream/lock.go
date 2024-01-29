@@ -10,6 +10,7 @@ import (
 	backoffv2 "github.com/lestrrat-go/backoff/v2"
 	"github.com/nats-io/nats.go"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Lock struct {
@@ -44,7 +45,7 @@ func (l *Lock) Key() string {
 
 func (l *Lock) acquire(ctx context.Context, retrier *backoffv2.Policy) (<-chan struct{}, error) {
 	var curErr error
-	mutex := newJetstreamMutex(l.lg, l.js, l.prefix, l.key)
+	mutex := newJetstreamMutex(l.lg, l.js, l.prefix, l.key, l.LockOptions)
 	done, err := mutex.tryLock()
 	curErr = err
 	if err == nil {
@@ -67,19 +68,19 @@ func (l *Lock) acquire(ctx context.Context, retrier *backoffv2.Policy) (<-chan s
 	return nil, curErr
 }
 
-func (l *Lock) Lock(ctx context.Context) (<-chan struct{}, error) {
+func (l *Lock) lock(ctx context.Context, retrier *backoffv2.Policy) (<-chan struct{}, error) {
+	if l.Tracer != nil {
+		ctxSpan, span := l.Tracer.Start(ctx, "Lock/jetstream-lock", trace.WithAttributes())
+		defer span.End()
+		ctx = ctxSpan
+	}
+	// https://github.com/lestrrat-go/backoff/issues/31
 	ctxca, ca := context.WithCancel(ctx)
 	defer ca()
 
 	var closureDone <-chan struct{}
 	if err := l.scheduler.Schedule(func() error {
-		done, err := l.acquire(ctxca,
-			lo.ToPtr(backoffv2.Constant(
-				backoffv2.WithMaxRetries(0),
-				backoffv2.WithInterval(LockRetryDelay),
-				backoffv2.WithJitterFactor(0.1),
-			)),
-		)
+		done, err := l.acquire(ctxca, retrier)
 		if err != nil {
 			return err
 		}
@@ -89,7 +90,15 @@ func (l *Lock) Lock(ctx context.Context) (<-chan struct{}, error) {
 		return nil, err
 	}
 	return closureDone, nil
+}
 
+func (l *Lock) Lock(ctx context.Context) (<-chan struct{}, error) {
+	retry := lo.ToPtr(backoffv2.Constant(
+		backoffv2.WithMaxRetries(0),
+		backoffv2.WithInterval(LockRetryDelay),
+		backoffv2.WithJitterFactor(0.1),
+	))
+	return l.lock(ctx, retry)
 }
 
 func (l *Lock) Unlock() error {
@@ -112,18 +121,8 @@ func (l *Lock) Unlock() error {
 }
 
 func (l *Lock) TryLock(ctx context.Context) (acquired bool, done <-chan struct{}, err error) {
-	// https://github.com/lestrrat-go/backoff/issues/31
-	ctxca, ca := context.WithCancel(ctx)
-	defer ca()
-	var closureDone <-chan struct{}
-	if err := l.scheduler.Schedule(func() error {
-		done, err := l.acquire(ctxca, nil)
-		if err != nil {
-			return err
-		}
-		closureDone = done
-		return nil
-	}); err != nil {
+	closureDone, err := l.lock(ctx, nil)
+	if err != nil {
 		// hack : jetstream client does not have a stronly typed error for : maxium consumers limit reached
 		if strings.Contains(err.Error(), "maximum consumers limit reached") {
 			// the request has gone through but someone else has the lock

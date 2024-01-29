@@ -9,6 +9,7 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type EtcdLock struct {
@@ -62,6 +63,7 @@ func (e *EtcdLock) acquire(ctx context.Context) (<-chan struct{}, error) {
 		e.prefix,
 		e.key,
 		session,
+		e.options,
 	)
 	var curErr error
 	done, err := mutex.lock(ctx)
@@ -83,6 +85,7 @@ func (e *EtcdLock) tryAcquire(ctx context.Context) (<-chan struct{}, error) {
 		e.prefix,
 		e.key,
 		session,
+		e.options,
 	)
 	done, err := mutex.tryLock(ctx)
 	var curErr = err
@@ -95,8 +98,12 @@ func (e *EtcdLock) tryAcquire(ctx context.Context) (<-chan struct{}, error) {
 
 func (e *EtcdLock) Lock(ctx context.Context) (<-chan struct{}, error) {
 	e.lg.Debug("trying to acquire blocking lock")
-
 	var closureDone <-chan struct{}
+	if e.options.Tracer != nil {
+		ctxSpan, span := e.options.Tracer.Start(ctx, "Lock/etcd-lock", trace.WithAttributes())
+		defer span.End()
+		ctx = ctxSpan
+	}
 	if err := e.scheduler.Schedule(func() error {
 		done, err := e.acquire(ctx)
 		if err != nil {
@@ -114,6 +121,11 @@ func (e *EtcdLock) Lock(ctx context.Context) (<-chan struct{}, error) {
 func (e *EtcdLock) TryLock(ctx context.Context) (acquired bool, done <-chan struct{}, err error) {
 	e.lg.Debug("trying to acquire non-blocking lock")
 	var closureDone <-chan struct{}
+	if e.options.Tracer != nil {
+		ctxSpan, span := e.options.Tracer.Start(ctx, "Lock/etcd-lock", trace.WithAttributes())
+		defer span.End()
+		ctx = ctxSpan
+	}
 	if err := e.scheduler.Schedule(func() error {
 		done, err := e.tryAcquire(ctx)
 		if err != nil {

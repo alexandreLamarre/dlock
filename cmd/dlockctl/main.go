@@ -116,6 +116,10 @@ func BuildLockCmd() *cobra.Command {
 				RETRY:
 					resp, err := client.Recv()
 					lg.Info("received lock event")
+					if err == io.EOF {
+						lg.Info("stream closed")
+						break
+					}
 					if err != nil {
 						if st, ok := status.FromError(err); ok && st.Code() == codes.Canceled {
 							lg.Error("lock expired from remote backend")

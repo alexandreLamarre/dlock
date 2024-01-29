@@ -3,6 +3,7 @@ package instrumentation
 import (
 	"context"
 
+	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -13,7 +14,12 @@ func NewTraceExporter(ctx context.Context) (sdktrace.SpanExporter, error) {
 	return stdouttrace.New(stdouttrace.WithPrettyPrint())
 }
 
-func NewTracerProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
+func NewTracerProvider() *sdktrace.TracerProvider {
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint())
+	if err != nil {
+		panic(err)
+	}
+
 	r, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
