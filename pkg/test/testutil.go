@@ -18,6 +18,8 @@ import (
 	natstest "github.com/nats-io/nats-server/v2/test"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega/gexec"
+	goredislib "github.com/redis/go-redis/v9"
+	"github.com/stvp/tempredis"
 	etcdserver "go.etcd.io/etcd/server/v3/embed"
 )
 
@@ -75,12 +77,6 @@ func (e *Environment) Stop(cause ...string) error {
 		}
 		wg.Wait()
 	}
-	if e.embeddedJS != nil {
-		e.embeddedJS.Shutdown()
-	}
-	if e.embeddedEtcd != nil {
-		e.embeddedEtcd.Close()
-	}
 	// if e.mockCtrl != nil {
 	// 	e.mockCtrl.Finish()
 	// }
@@ -137,6 +133,21 @@ func StartCmd(cmd *exec.Cmd) (Session, error) {
 
 }
 
+func (e *Environment) StartRedis() ([]*goredislib.Options, error) {
+	server, err := tempredis.Start(tempredis.Config{}, tempredis.WithWriter(ginkgo.GinkgoWriter))
+	if err != nil {
+		return nil, err
+	}
+	e.addShutdownHook(func() {
+		server.Term()
+	})
+	return []*goredislib.Options{
+		{
+			Network: "unix",
+			Addr:    server.Socket(),
+		}}, nil
+}
+
 // FIXME: set the ports to freeports
 func (e *Environment) StartEtcd() (*v1alpha1.EtcdStorageSpec, error) {
 	conf := etcdserver.NewConfig()
@@ -155,6 +166,9 @@ func (e *Environment) StartEtcd() (*v1alpha1.EtcdStorageSpec, error) {
 		return nil, err
 	}
 	e.embeddedEtcd = server
+	e.addShutdownHook(func() {
+		server.Close()
+	})
 	return &v1alpha1.EtcdStorageSpec{
 		Endpoints: []string{etcdserver.DefaultAdvertiseClientURLs},
 	}, nil
@@ -167,7 +181,11 @@ func (e *Environment) StartJetstream() (*v1alpha1.JetStreamStorageSpec, error) {
 	opts.Port = ports[0]
 	opts.StoreDir = e.tempDir
 
-	e.embeddedJS = natstest.RunServer(&opts)
+	server := natstest.RunServer(&opts)
+	e.embeddedJS = server
+	e.addShutdownHook(func() {
+		server.Shutdown()
+	})
 	e.embeddedJS.EnableJetStream(nil)
 	if !e.embeddedJS.ReadyForConnections(2 * time.Second) {
 		return nil, errors.New("starting nats server: timeout")

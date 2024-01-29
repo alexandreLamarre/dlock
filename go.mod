@@ -6,8 +6,10 @@ replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.8
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.61.0
 
+replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => /home/alex/repos/tempredis
+
 require (
-	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redsync/redsync/v4 v4.11.0
 	github.com/google/uuid v1.6.0
 	github.com/jwalton/go-supportscolor v1.2.0
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
@@ -17,10 +19,13 @@ require (
 	github.com/onsi/ginkgo/v2 v2.15.0
 	github.com/onsi/gomega v1.31.1
 	github.com/prometheus/client_golang v1.18.0
+	github.com/redis/go-redis/v9 v9.0.2
+	github.com/redis/rueidis v1.0.19
 	github.com/samber/lo v1.39.0
 	github.com/samber/slog-multi v1.0.2
 	github.com/samber/slog-sampling v1.4.0
 	github.com/spf13/cobra v1.8.0
+	github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
 	go.etcd.io/etcd/client/v3 v3.5.11
 	go.etcd.io/etcd/server/v3 v3.5.11
@@ -48,6 +53,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/cornelk/hashmap v1.0.8 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -75,7 +81,6 @@ require (
 	github.com/nats-io/jwt/v2 v2.5.3 // indirect
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.45.0 // indirect
