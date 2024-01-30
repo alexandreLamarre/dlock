@@ -27,6 +27,7 @@ testbin/
 # data directories
 
 default.etcd/
+default.*
 *.rdb
 
 # dev configs
