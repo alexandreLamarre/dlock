@@ -54,8 +54,8 @@ func NewLockServer(
 	}
 	config := &configv1alpha1.LockServerConfig{}
 	if err := json.NewDecoder(bytes.NewReader(configData)).Decode(&config); err != nil {
-		lg.With("configPath", configPath).Error("failed to decode config file")
-		return ls
+		lg.With("configPath", configPath, logger.Err(err)).Error("failed to decode config file")
+		panic(err)
 	}
 	lm := broker.NewLockManager(ctx, tracer, logger.NewNop(), config)
 	ls.lm = lm
