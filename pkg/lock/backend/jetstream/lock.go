@@ -39,10 +39,6 @@ func NewLock(js nats.JetStreamContext, prefix, key string, lg *slog.Logger, opti
 	}
 }
 
-func (l *Lock) Key() string {
-	return l.key
-}
-
 func (l *Lock) acquire(ctx context.Context, retrier *backoffv2.Policy) (<-chan struct{}, error) {
 	var curErr error
 	mutex := newJetstreamMutex(l.lg, l.js, l.prefix, l.key, l.LockOptions)
@@ -69,7 +65,7 @@ func (l *Lock) acquire(ctx context.Context, retrier *backoffv2.Policy) (<-chan s
 }
 
 func (l *Lock) lock(ctx context.Context, retrier *backoffv2.Policy) (<-chan struct{}, error) {
-	if l.Tracer != nil {
+	if l.TracingEnabled() {
 		ctxSpan, span := l.Tracer.Start(ctx, "Lock/jetstream-lock", trace.WithAttributes())
 		defer span.End()
 		ctx = ctxSpan

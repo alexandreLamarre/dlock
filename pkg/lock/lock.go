@@ -137,6 +137,16 @@ func (o *LockOptions) Apply(opts ...LockOption) {
 	}
 }
 
+func (o *LockOptions) TracingEnabled() bool {
+	return o.Tracer != nil
+}
+
+func (o *LockOptions) RecordError(span trace.Span, err error) {
+	if span != nil {
+		span.RecordError(err)
+	}
+}
+
 type LockOption func(o *LockOptions)
 
 func WithTracer(tracer trace.Tracer) LockOption {

@@ -170,7 +170,7 @@ func (m *redisMutex) unlock() (bool, error) {
 	m.lg.Debug("unlock requested")
 	ctx := context.Background()
 	var span trace.Span
-	if m.Tracer != nil {
+	if m.TracingEnabled() {
 		ctx, span = m.Tracer.Start(context.Background(), "Unlock/redis-unlock", trace.WithAttributes(
 			attribute.KeyValue{
 				Key:   "key",
@@ -188,9 +188,7 @@ func (m *redisMutex) unlock() (bool, error) {
 	})
 	if n < m.quorum {
 		m.lg.With(logger.Err(err)).Warn("failed to release lock no consensus : ")
-		if span != nil {
-			span.RecordError(err)
-		}
+		m.RecordError(span, err)
 		return false, err
 	}
 	return true, nil

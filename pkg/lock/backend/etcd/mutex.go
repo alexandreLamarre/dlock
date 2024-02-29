@@ -100,7 +100,7 @@ func (e *etcdMutex) teardown() {
 func (e *etcdMutex) unlock() error {
 	var span trace.Span
 	ctx := context.Background()
-	if e.Tracer != nil {
+	if e.TracingEnabled() {
 		ctxSpan, span := e.Tracer.Start(ctx, "Lock/etcd-unlock", trace.WithAttributes(
 			attribute.KeyValue{
 				Key:   "key",
@@ -112,9 +112,7 @@ func (e *etcdMutex) unlock() error {
 	}
 	if e.mutex == nil {
 		err := errors.New("mutex not acquired")
-		if span != nil {
-			span.RecordError(err)
-		}
+		e.RecordError(span, err)
 		return err
 	}
 	defer e.teardown()
@@ -126,7 +124,7 @@ func (e *etcdMutex) unlock() error {
 		defer ca()
 		if err := mutex.Unlock(ctxca); err != nil {
 			e.lg.Warn("failed to unlock mutex", "err", err.Error())
-			span.RecordError(err)
+			e.RecordError(span, err)
 		}
 	}()
 	return nil
