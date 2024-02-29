@@ -151,7 +151,7 @@ func (j *jetstreamMutex) unlock() error {
 	defer j.teardown()
 	ctx := context.Background()
 	var span trace.Span
-	if j.Tracer != nil {
+	if j.TracingEnabled() {
 		ctx, span = j.Tracer.Start(context.Background(), "Unlock/jetstream-unlock", trace.WithAttributes(
 			attribute.KeyValue{
 				Key:   "key",
@@ -179,14 +179,10 @@ func (j *jetstreamMutex) unlock() error {
 				return nil
 			}
 			j.lg.Warn(fmt.Sprintf("failed to unlock : %s, retrying...", err.Error()))
-			if span != nil {
-				span.RecordError(err)
-			}
+			j.RecordError(span, err)
 		case <-ctx.Done():
 			err := ctx.Err()
-			if span != nil {
-				span.RecordError(err)
-			}
+			j.RecordError(span, err)
 			return err
 		}
 	}

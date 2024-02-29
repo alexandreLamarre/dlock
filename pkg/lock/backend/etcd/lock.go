@@ -18,7 +18,7 @@ type EtcdLock struct {
 	prefix string
 	key    string
 
-	options *lock.LockOptions
+	*lock.LockOptions
 
 	scheduler *lock.LockScheduler
 
@@ -33,16 +33,16 @@ func NewEtcdLock(
 	options *lock.LockOptions,
 ) *EtcdLock {
 	return &EtcdLock{
-		lg:        lg,
-		client:    client,
-		prefix:    prefix,
-		key:       key,
-		options:   options,
-		scheduler: lock.NewLockScheduler(),
+		lg:          lg,
+		client:      client,
+		prefix:      prefix,
+		key:         key,
+		LockOptions: options,
+		scheduler:   lock.NewLockScheduler(),
 	}
 }
 
-func (e *EtcdLock) newSession(ctx context.Context) (*concurrency.Session, error) {
+func (e *EtcdLock) newSession(_ context.Context) (*concurrency.Session, error) {
 	e.lg.Debug("attempting to create new etcd session...")
 	session, err := concurrency.NewSession(e.client)
 	if err != nil {
@@ -63,7 +63,7 @@ func (e *EtcdLock) acquire(ctx context.Context) (<-chan struct{}, error) {
 		e.prefix,
 		e.key,
 		session,
-		e.options,
+		e.LockOptions,
 	)
 	var curErr error
 	done, err := mutex.lock(ctx)
@@ -85,7 +85,7 @@ func (e *EtcdLock) tryAcquire(ctx context.Context) (<-chan struct{}, error) {
 		e.prefix,
 		e.key,
 		session,
-		e.options,
+		e.LockOptions,
 	)
 	done, err := mutex.tryLock(ctx)
 	var curErr = err
@@ -99,8 +99,8 @@ func (e *EtcdLock) tryAcquire(ctx context.Context) (<-chan struct{}, error) {
 func (e *EtcdLock) Lock(ctx context.Context) (<-chan struct{}, error) {
 	e.lg.Debug("trying to acquire blocking lock")
 	var closureDone <-chan struct{}
-	if e.options.Tracer != nil {
-		ctxSpan, span := e.options.Tracer.Start(ctx, "Lock/etcd-lock", trace.WithAttributes())
+	if e.TracingEnabled() {
+		ctxSpan, span := e.Tracer.Start(ctx, "Lock/etcd-lock", trace.WithAttributes())
 		defer span.End()
 		ctx = ctxSpan
 	}
@@ -121,8 +121,8 @@ func (e *EtcdLock) Lock(ctx context.Context) (<-chan struct{}, error) {
 func (e *EtcdLock) TryLock(ctx context.Context) (acquired bool, done <-chan struct{}, err error) {
 	e.lg.Debug("trying to acquire non-blocking lock")
 	var closureDone <-chan struct{}
-	if e.options.Tracer != nil {
-		ctxSpan, span := e.options.Tracer.Start(ctx, "Lock/etcd-lock", trace.WithAttributes())
+	if e.TracingEnabled() {
+		ctxSpan, span := e.Tracer.Start(ctx, "Lock/etcd-lock", trace.WithAttributes())
 		defer span.End()
 		ctx = ctxSpan
 	}

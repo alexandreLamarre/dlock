@@ -86,7 +86,7 @@ func (l *Lock) TryLock(ctx context.Context) (acquired bool, expired <-chan struc
 }
 
 func (l *Lock) lock(ctx context.Context, retrier *backoffv2.Policy) (expired <-chan struct{}, err error) {
-	if l.Tracer != nil {
+	if l.TracingEnabled() {
 		ctxSpan, span := l.Tracer.Start(ctx, "Lock/redis-lock")
 		defer span.End()
 		ctx = ctxSpan
