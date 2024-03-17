@@ -1,7 +1,11 @@
 package etcd
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -30,6 +34,22 @@ func NewEtcdLockManager(
 		lg:     lg,
 	}
 	return lm
+}
+
+func (e *EtcdLockManager) Health(ctx context.Context) (conditions []string, err error) {
+	conditions = make([]string, 0)
+	remoteEndpoints := e.client.Endpoints()
+	for _, endp := range remoteEndpoints {
+		resp, stErr := e.client.Status(ctx, endp)
+		if stErr != nil {
+			err = errors.Join(err, stErr)
+			continue
+		}
+		if len(resp.Errors) > 0 {
+			conditions = append(conditions, fmt.Sprintf("%s : %s", endp, strings.Join(resp.Errors, ",")))
+		}
+	}
+	return
 }
 
 // !! Cannot reuse *concurrency.Session across multiple locks since it will break liveliness guarantee A

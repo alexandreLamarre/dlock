@@ -2,11 +2,17 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/go-redsync/redsync/v4/redis"
 )
+
+var pingScript = redis.NewScript(0, `
+	local info = redis.call("INFO")
+	return info
+`)
 
 type LockManager struct {
 	ctx    context.Context
@@ -33,6 +39,23 @@ func NewLockManager(
 		quorum: len(pools)/2 + 1,
 		lg:     lg,
 	}
+}
+
+func (lm *LockManager) Health(ctx context.Context) (conditions []string, err error) {
+	for i, pool := range lm.pools {
+		conn, poolErr := pool.Get(ctx)
+		if poolErr != nil {
+			err = errors.Join(err, poolErr)
+			continue
+		}
+		info, evalErr := conn.Eval(pingScript)
+		if evalErr != nil {
+			err = errors.Join(err, evalErr)
+			continue
+		}
+		lm.lg.With("pool", i).Info("got status : %s", info)
+	}
+	return []string{}, nil
 }
 
 func (lm *LockManager) NewLock(key string, opt ...lock.LockOption) lock.Lock {

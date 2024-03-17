@@ -39,7 +39,7 @@ func NewLockBroker(
 // when an unrecoverable error is hit
 func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
 	if l.config.EtcdClientSpec != nil {
-		l.lg.Info("acquiring etcd client ...")
+		l.lg.Info("acquiring etcd client...")
 		cli, err := etcd.NewEtcdClient(ctx, l.config.EtcdClientSpec)
 		if err != nil {
 			l.lg.With(logger.Err(err)).Warn("failed to acquired etcd client")
@@ -49,7 +49,7 @@ func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
 	}
 
 	if l.config.JetstreamClientSpec != nil {
-		l.lg.Info("acquiring jetstream client ...")
+		l.lg.Info("acquiring jetstream client...")
 		cli, err := jetstream.AcquireJetstreamConn(ctx, l.config.JetstreamClientSpec, l.lg)
 		if err != nil {
 			l.lg.With(logger.Err(err)).Warn("failed to acquired jetstream client")
@@ -59,7 +59,7 @@ func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
 	}
 
 	if l.config.RedisClientSpec != nil {
-		l.lg.Info("acquiring redis client ...")
+		l.lg.Info("acquiring redis client...")
 		cli := redis.AcquireRedisPool([]*goredislib.Options{
 			{
 				Addr:    l.config.RedisClientSpec.Addr,

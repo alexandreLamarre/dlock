@@ -46,7 +46,12 @@ type Lock interface {
 	Unlock() error
 }
 
+// LockManager is a factory for Lock instances
 type LockManager interface {
+	// Checks the health of the LockManager backend, conditions are a list of opaque
+	// issues that may be present in the backend.
+	Health(ctx context.Context) (conditions []string, err error)
+
 	// Instantiates a new Lock instance for the given key, with the given options.
 	//
 	// Defaults to lock.DefaultOptions if no options are provided.

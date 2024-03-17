@@ -20,6 +20,8 @@ type LockManager struct {
 	prefix string
 }
 
+var _ lock.LockManager = (*LockManager)(nil)
+
 func NewLockManager(
 	ctx context.Context,
 	js nats.JetStreamContext,
@@ -37,7 +39,15 @@ func NewLockManager(
 	}
 }
 
-var _ lock.LockManager = (*LockManager)(nil)
+func (l *LockManager) Health(ctx context.Context) (conditions []string, err error) {
+	// We could be using jsm.go here: https://github.com/nats-io/jsm.go
+	// for now, we'll count account info as a health check
+	_, err = l.js.AccountInfo()
+	if err != nil {
+		return nil, err
+	}
+	return []string{}, nil
+}
 
 func (l *LockManager) NewLock(key string, opts ...lock.LockOption) lock.Lock {
 	options := lock.DefaultLockOptions()

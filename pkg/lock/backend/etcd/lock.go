@@ -42,7 +42,7 @@ func NewEtcdLock(
 	}
 }
 
-func (e *EtcdLock) newSession(ctx context.Context) (*concurrency.Session, error) {
+func (e *EtcdLock) newSession(_ context.Context) (*concurrency.Session, error) {
 	e.lg.Debug("attempting to create new etcd session...")
 	session, err := concurrency.NewSession(e.client)
 	if err != nil {
