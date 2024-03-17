@@ -1,0 +1,20 @@
+syntax="proto3";
+
+import "google/protobuf/empty.proto";
+option go_package="github.com/alexandreLamarre/dlock/internal/embedded/api";
+
+package embedded;
+
+service DistributedMutex {
+    rpc Lock(LockRequest) returns (stream LockResponse) {};
+    rpc Unlock(LockRequest) returns (google.protobuf.Empty) {};
+}
+
+message LockRequest {
+    string key = 1;
+    string value = 2;
+}
+
+message LockResponse {
+    string nodeId = 1;
+}

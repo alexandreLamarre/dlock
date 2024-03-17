@@ -26,6 +26,7 @@ import (
 	"google.golang.org/grpc/codes"
 	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
 
@@ -36,7 +37,8 @@ type LockServer struct {
 	lg     *slog.Logger
 	tracer trace.Tracer
 
-	lm lock.LockManager
+	lm     lock.LockManager
+	config *configv1alpha1.LockServerConfig
 }
 
 var _ v1alpha1.DlockServer = &LockServer{}
@@ -95,6 +97,7 @@ func (s *LockServer) Initialize(
 		}
 		lg.Info("successfully acquired lock manager backend")
 		s.lm = lm
+		s.config = config
 	})
 	return retErr
 }
@@ -215,6 +218,7 @@ func (s *LockServer) ListenAndServe(ctx context.Context, addr string) error {
 	)
 	server.RegisterService(&v1alpha1.Dlock_ServiceDesc, s)
 	server.RegisterService(&healthv1.Health_ServiceDesc, s)
+	reflection.Register(server)
 	errC := lo.Async(func() error {
 		s.lg.With("addr", addr).Info("starting distributed lock server...")
 		return server.Serve(listener)
