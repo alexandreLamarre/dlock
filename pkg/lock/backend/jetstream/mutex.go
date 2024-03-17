@@ -30,7 +30,7 @@ var (
 	LockRetryDelay = 100 * time.Millisecond
 )
 
-// encapsulates stateful information and tasks requried for holding a lock
+// encapsulates stateful information and tasks required for holding a lock
 type jetstreamMutex struct {
 	lg *slog.Logger
 

@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// encapsulates stateful information and tasks requried for holding a lock
+// encapsulates stateful information and tasks required for holding a lock
 type etcdMutex struct {
 	lg *slog.Logger
 

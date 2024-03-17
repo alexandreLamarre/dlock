@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/alexandreLamarre/dlock/api/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/constants"
@@ -18,6 +19,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/status"
 )
 
@@ -44,6 +46,7 @@ func BuildRootCmd() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringVarP(&serverAddr, "addr", "a", constants.DefaultDlockGrpcAddr, "dlock server address")
 	cmd.AddCommand(BuildLockCmd())
+	cmd.AddCommand(BuildDlockHealthCmd())
 	return cmd
 }
 
@@ -116,20 +119,26 @@ func BuildLockCmd() *cobra.Command {
 				RETRY:
 					resp, err := client.Recv()
 					lg.Info("received lock event")
-					if err == io.EOF {
+					if errors.Is(err, io.EOF) {
 						lg.Info("stream closed")
 						break
 					}
 					if err != nil {
-						if st, ok := status.FromError(err); ok && st.Code() == codes.Canceled {
-							lg.Error("lock expired from remote backend")
+						errLg := lg.With(logger.Err(err))
+						st, ok := status.FromError(err)
+						if ok && st.Code() == codes.Canceled {
+							errLg.Error("lock expired from remote backend")
+							break
+						}
+						if ok && st.Code() == codes.Unavailable {
+							errLg.Error("lock server unavailable, stopping...")
 							break
 						}
 						if errors.Is(err, io.EOF) {
-							lg.Error("stream closed")
+							errLg.Error("stream closed")
 							break
 						}
-						lg.Error("failed to receive lock event", "err", err)
+						errLg.Error("failed to receive lock event")
 						goto RETRY
 					}
 					if resp.Event == v1alpha1.LockEvent_Acquired {
@@ -149,6 +158,40 @@ func BuildLockCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&key, "dlock.key", "k", "", "key to lock")
 	cmd.Flags().BoolVarP(&block, "dlock.block", "b", false, "whether or not to block on lock acquisition")
 	return cmd
+}
+
+func BuildDlockHealthCmd() *cobra.Command {
+	var timeout time.Duration
+	cmd := &cobra.Command{
+		Use:   "health",
+		Short: "Checks the health of the dlock server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := getHealthClient(serverAddr)
+			if err != nil {
+				lg.With(logger.Err(err)).Error("failed to acquire health client")
+				return err
+			}
+			ctxca, ca := context.WithTimeout(cmd.Context(), timeout)
+			defer ca()
+			st, err := client.Check(ctxca, &healthv1.HealthCheckRequest{})
+			if err != nil {
+				lg.With(logger.Err(err)).Error("failed to check health")
+				return err
+			}
+			lg.With("status", st.Status).Info("health check successful")
+			return nil
+		},
+	}
+	cmd.Flags().DurationVarP(&timeout, "timeout", "t", 5*time.Second, "timeout for health check")
+	return cmd
+}
+
+func getHealthClient(addr string) (healthv1.HealthClient, error) {
+	cc, err := setupConn(addr)
+	if err != nil {
+		return nil, err
+	}
+	return healthv1.NewHealthClient(cc), nil
 }
 
 func getDlockClient(addr string) (v1alpha1.DlockClient, error) {

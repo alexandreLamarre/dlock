@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net"
 	"net/url"
@@ -15,6 +16,7 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
+	"github.com/alexandreLamarre/dlock/pkg/util"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/attribute"
@@ -22,11 +24,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 )
 
 type LockServer struct {
+	util.Initializer
 	v1alpha1.UnimplementedDlockServer
 
 	lg     *slog.Logger
@@ -34,6 +38,9 @@ type LockServer struct {
 
 	lm lock.LockManager
 }
+
+var _ v1alpha1.DlockServer = &LockServer{}
+var _ healthv1.HealthServer = &LockServer{}
 
 func NewLockServer(
 	ctx context.Context,
@@ -46,24 +53,53 @@ func NewLockServer(
 		lg:     lg,
 		tracer: tracer,
 	}
-	RegisterMeterProvider(metric)
-	configData, err := os.ReadFile(configPath)
-	if err != nil {
-		lg.With("configPath", configPath).Error("failed to read config file")
-		return ls
-	}
-	config := &configv1alpha1.LockServerConfig{}
-	if err := json.NewDecoder(bytes.NewReader(configData)).Decode(&config); err != nil {
-		lg.With("configPath", configPath, logger.Err(err)).Error("failed to decode config file")
+	if err := ls.Initialize(
+		ctx,
+		configPath,
+		metric,
+		lg,
+	); err != nil {
+		lg.With(logger.Err(err)).Error("failed to initialize lock server")
 		panic(err)
 	}
-	lm := broker.NewLockManager(ctx, tracer, logger.NewNop(), config)
-	ls.lm = lm
 	return ls
 }
 
-var _ v1alpha1.DlockServer = &LockServer{}
+func (s *LockServer) Initialize(
+	ctx context.Context,
+	configPath string,
+	metric *sdkmetric.MeterProvider,
+	lg *slog.Logger,
+) error {
+	var retErr error
+	s.InitOnce(func() {
+		RegisterMeterProvider(metric)
+		configData, err := os.ReadFile(configPath)
+		if err != nil {
+			lg.With("configPath", configPath).Error("failed to read config file")
+			retErr = err
+			return
+		}
+		config := &configv1alpha1.LockServerConfig{}
+		if err := json.NewDecoder(bytes.NewReader(configData)).Decode(&config); err != nil {
+			lg.With("configPath", configPath, logger.Err(err)).Error("failed to decode config file")
+			retErr = err
+			return
+		}
+		broker := broker.NewLockBroker(lg, config, s.tracer)
 
+		lm, err := broker.LockManager(ctx)
+		if err != nil {
+			retErr = fmt.Errorf("failed to acquire lock manager backend : %w", err)
+			return
+		}
+		lg.Info("successfully acquired lock manager backend")
+		s.lm = lm
+	})
+	return retErr
+}
+
+// Distributed locking server
 func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockServer) error {
 	LockRequestCount.Add(stream.Context(), 1)
 	lg := s.lg.With("key", in.Key, "block", !in.TryLock)
@@ -156,11 +192,13 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 func (s *LockServer) ListenAndServe(ctx context.Context, addr string) error {
 	url, err := url.Parse(addr)
 	if err != nil {
+		s.lg.With(logger.Err(err)).Error("failed to parse dlock listen server address")
 		return err
 	}
 
 	listener, err := net.Listen(url.Scheme, url.Host)
 	if err != nil {
+		s.lg.With(logger.Err(err)).Error("failed to listen on dlock server address")
 		return err
 	}
 
@@ -176,6 +214,7 @@ func (s *LockServer) ListenAndServe(ctx context.Context, addr string) error {
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 	)
 	server.RegisterService(&v1alpha1.Dlock_ServiceDesc, s)
+	server.RegisterService(&healthv1.Health_ServiceDesc, s)
 	errC := lo.Async(func() error {
 		s.lg.With("addr", addr).Info("starting distributed lock server...")
 		return server.Serve(listener)
