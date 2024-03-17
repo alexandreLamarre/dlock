@@ -57,7 +57,13 @@ func NewLockServer(
 		lg.With("configPath", configPath, logger.Err(err)).Error("failed to decode config file")
 		panic(err)
 	}
-	lm := broker.NewLockManager(ctx, tracer, logger.NewNop(), config)
+	broker := broker.NewLockBroker(lg, config, tracer)
+
+	lm, err := broker.LockManager(ctx)
+	if err != nil {
+		panic("failed to acquire lock manager backend")
+	}
+	lg.Info("successfully acquired lock manager backend")
 	ls.lm = lm
 	return ls
 }
@@ -156,11 +162,13 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 func (s *LockServer) ListenAndServe(ctx context.Context, addr string) error {
 	url, err := url.Parse(addr)
 	if err != nil {
+		s.lg.With(logger.Err(err)).Error("failed to parse dlock listen server address")
 		return err
 	}
 
 	listener, err := net.Listen(url.Scheme, url.Host)
 	if err != nil {
+		s.lg.With(logger.Err(err)).Error("failed to listen on dlock server address")
 		return err
 	}
 
