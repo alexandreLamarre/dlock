@@ -8,13 +8,13 @@ import (
 
 type MTLSSpecShape = struct {
 	// Path to the server CA certificate.
-	ServerCA string `json:"serverCA,omitempty"`
+	ServerCA string `json:"serverCA,omitempty" toml:"serverCA"`
 	// Path to the client CA certificate (not needed in all cases).
-	ClientCA string `json:"clientCA,omitempty"`
+	ClientCA string `json:"clientCA,omitempty" toml:"clientCA"`
 	// Path to the certificate used for client-cert auth.
-	ClientCert string `json:"clientCert,omitempty"`
+	ClientCert string `json:"clientCert,omitempty" toml:"clientCert"`
 	// Path to the private key used for client-cert auth.
-	ClientKey string `json:"clientKey,omitempty"`
+	ClientKey string `json:"clientKey,omitempty" toml:"clientKey"`
 }
 
 func LoadClientMTLSConfig(certs MTLSSpecShape) (*tls.Config, error) {

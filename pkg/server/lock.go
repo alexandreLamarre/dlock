@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/alexandreLamarre/dlock/api/v1alpha1"
 	configv1alpha1 "github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
@@ -65,6 +66,21 @@ func NewLockServer(
 	return ls
 }
 
+func decode(data []byte) (*configv1alpha1.LockServerConfig, error) {
+	config := &configv1alpha1.LockServerConfig{}
+	r := bytes.NewReader(data)
+	jsonErr := json.NewDecoder(r).Decode(config)
+	if jsonErr == nil {
+		return config, nil
+	}
+	md, tomlErr := toml.Decode(string(data), config)
+	fmt.Println(md)
+	if tomlErr == nil {
+		return config, nil
+	}
+	return nil, fmt.Errorf("failed to decode config as JSON: %w, failed to decode config as TOML: %w", jsonErr, tomlErr)
+}
+
 func (s *LockServer) Initialize(
 	ctx context.Context,
 	configPath string,
@@ -80,8 +96,8 @@ func (s *LockServer) Initialize(
 			retErr = err
 			return
 		}
-		config := &configv1alpha1.LockServerConfig{}
-		if err := json.NewDecoder(bytes.NewReader(configData)).Decode(&config); err != nil {
+		config, err := decode(configData)
+		if err != nil {
 			lg.With("configPath", configPath, logger.Err(err)).Error("failed to decode config file")
 			retErr = err
 			return
