@@ -26,7 +26,7 @@ require (
 	github.com/samber/slog-multi v1.0.2
 	github.com/samber/slog-sampling v1.4.2
 	github.com/spf13/cobra v1.8.0
-	github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203
+	github.com/stvp/tempredis v0.0.0-20231107154819-8a695b693b9c
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
 	go.etcd.io/etcd/client/v3 v3.5.13
 	go.etcd.io/etcd/server/v3 v3.5.13
