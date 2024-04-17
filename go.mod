@@ -1,46 +1,46 @@
 module github.com/alexandreLamarre/dlock
 
-go 1.21.3
+go 1.22.2
 
-replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.8
+replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.9
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.61.0
+replace google.golang.org/grpc => google.golang.org/grpc v1.63.2
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
 require (
-	github.com/go-redsync/redsync/v4 v4.11.0
+	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/google/uuid v1.6.0
 	github.com/jwalton/go-supportscolor v1.2.0
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
 	github.com/lestrrat-go/backoff/v2 v2.0.8
-	github.com/nats-io/nats-server/v2 v2.10.9
-	github.com/nats-io/nats.go v1.32.0
-	github.com/onsi/ginkgo/v2 v2.15.0
-	github.com/onsi/gomega v1.31.1
-	github.com/prometheus/client_golang v1.18.0
-	github.com/redis/go-redis/v9 v9.0.2
-	github.com/redis/rueidis v1.0.19
+	github.com/nats-io/nats-server/v2 v2.10.14
+	github.com/nats-io/nats.go v1.34.1
+	github.com/onsi/ginkgo/v2 v2.17.1
+	github.com/onsi/gomega v1.32.0
+	github.com/prometheus/client_golang v1.19.0
+	github.com/redis/go-redis/v9 v9.5.1
+	github.com/redis/rueidis v1.0.34
 	github.com/samber/lo v1.39.0
 	github.com/samber/slog-multi v1.0.2
-	github.com/samber/slog-sampling v1.4.0
+	github.com/samber/slog-sampling v1.4.2
 	github.com/spf13/cobra v1.8.0
 	github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203
-	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
-	go.etcd.io/etcd/client/v3 v3.5.11
-	go.etcd.io/etcd/server/v3 v3.5.11
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.0
-	go.opentelemetry.io/otel v1.22.0
+	github.com/ttacon/chalk v0.1
+	go.etcd.io/etcd/client/v3 v3.5.13
+	go.etcd.io/etcd/server/v3 v3.5.13
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.50.0
+	go.opentelemetry.io/otel v1.25.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
-	go.opentelemetry.io/otel/exporters/prometheus v0.45.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.22.0
-	go.opentelemetry.io/otel/metric v1.22.0
-	go.opentelemetry.io/otel/sdk v1.22.0
-	go.opentelemetry.io/otel/sdk/metric v1.22.0
-	go.opentelemetry.io/otel/trace v1.22.0
-	golang.org/x/sync v0.5.0
-	google.golang.org/grpc v1.59.0
-	google.golang.org/protobuf v1.32.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.47.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.25.0
+	go.opentelemetry.io/otel/metric v1.25.0
+	go.opentelemetry.io/otel/sdk v1.25.0
+	go.opentelemetry.io/otel/sdk/metric v1.25.0
+	go.opentelemetry.io/otel/trace v1.25.0
+	golang.org/x/sync v0.7.0
+	google.golang.org/grpc v1.63.2
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
