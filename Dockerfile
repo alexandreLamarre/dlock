@@ -19,7 +19,7 @@ COPY . .
 # Build
 RUN make build
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 COPY --from=builder /usr/src/app/bin/dlock /usr/local/bin/dlock
 COPY --from=builder /usr/src/app/bin/dlockctl /usr/local/bin/dlockctl
