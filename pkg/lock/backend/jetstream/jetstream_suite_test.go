@@ -9,7 +9,6 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/jetstream"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
-	"github.com/alexandreLamarre/dlock/pkg/test"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
 	"github.com/alexandreLamarre/dlock/pkg/test/container"
 	"github.com/alexandreLamarre/dlock/pkg/util/future"
@@ -30,8 +29,6 @@ var lmSetF = future.New[lo.Tuple3[
 
 var _ = BeforeSuite(func() {
 	if Label("integration").MatchesLabelFilter(GinkgoLabelFilter()) {
-		env := test.Environment{}
-		Expect(env.Start()).To(Succeed())
 		ctxca, ca := context.WithCancel(context.Background())
 		DeferCleanup(func() {
 			ca()
@@ -93,7 +90,6 @@ var _ = BeforeSuite(func() {
 		lmSetF.Set(lo.Tuple3[lock.LockManager, lock.LockManager, lock.LockManager]{
 			A: x, B: y, C: z,
 		})
-		DeferCleanup(env.Stop, "Test Suite Finished")
 	}
 })
 
