@@ -2,17 +2,21 @@ package etcd_test
 
 import (
 	"context"
+	"net/url"
 	"testing"
+	"time"
 
+	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/etcd"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
-	"github.com/alexandreLamarre/dlock/pkg/test"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
+	"github.com/alexandreLamarre/dlock/pkg/test/container"
 	"github.com/alexandreLamarre/dlock/pkg/util/future"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/samber/lo"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 func TestEtcd(t *testing.T) {
@@ -27,14 +31,40 @@ var lmSet = future.New[lo.Tuple3[
 
 var _ = BeforeSuite(func() {
 	if Label("integration").MatchesLabelFilter(GinkgoLabelFilter()) {
-		env := test.Environment{}
-		Expect(env.Start()).To(Succeed())
+		ctx := context.Background()
+		ctxca, ca := context.WithCancel(ctx)
+		DeferCleanup(
+			func() {
+				ca()
+			},
+		)
+		etcdC, err := container.StartEtcdContainer(ctxca)
+		Expect(err).NotTo(HaveOccurred())
 
-		conf, err := env.StartEtcd()
-		Expect(err).To(Succeed())
+		DeferCleanup(func() {
+			etcdC.Container.Terminate(ctx)
+		})
+		etcdUrl, err := url.Parse(etcdC.URI)
+		Expect(err).NotTo(HaveOccurred())
+		conf := &v1alpha1.EtcdClientSpec{
+			Endpoints: []string{
+				etcdUrl.String(),
+			},
+		}
 
 		cli, err := etcd.NewEtcdClient(context.Background(), conf)
 		Expect(err).To(Succeed())
+		ctxT, caT := context.WithTimeout(ctxca, 1*time.Second)
+		DeferCleanup(func() {
+			caT()
+		})
+		kapi := clientv3.NewKV(cli)
+		resp, err := kapi.Put(ctxT, "/foo", "bar")
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.Header.Revision).To(BeNumerically(">", 0))
+		// Set the key foo
+		// resp, err := kapi.Set(ctxT), "/foo", "bar")
+		// Expect(err).NotTo(HaveOccurred())
 
 		lm := etcd.NewEtcdLockManager(cli, "test", nil, logger.NewNop())
 		lmF.Set(lm)
@@ -58,7 +88,7 @@ var _ = BeforeSuite(func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(err).To(Succeed())
-		DeferCleanup(env.Stop, "Test Suite Finished")
+		// DeferCleanup(env.Stop, "Test Suite Finished")
 	}
 })
 
