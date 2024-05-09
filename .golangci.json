@@ -17,9 +17,12 @@
         }
     },
     "run": {
-        "skip-files": [
-            "/zz_generated_"
-        ],
+        "issues": {
+            "exclude-files": [
+                "/zz_generated_",
+                "*.pb.go"
+            ]
+        },
         "deadline": "5m"
     }
 }
