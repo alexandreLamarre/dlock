@@ -2,8 +2,6 @@ module github.com/alexandreLamarre/dlock
 
 go 1.22.2
 
-replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.10
-
 replace google.golang.org/grpc => google.golang.org/grpc v1.63.2
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
