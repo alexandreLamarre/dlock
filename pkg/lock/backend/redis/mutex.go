@@ -227,7 +227,7 @@ var touchScript = redis.NewScript(1, `
 	end
 `)
 
-func (m *redisMutex) touch(ctx context.Context, pool redis.Pool, value string, expiry int) (bool, error) {
+func (m *redisMutex) touch(ctx context.Context, pool redis.Pool, value string, _ /*expiry*/ int) (bool, error) {
 	conn, err := pool.Get(ctx)
 	if err != nil {
 		return false, nil

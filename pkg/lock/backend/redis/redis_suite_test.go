@@ -2,16 +2,20 @@ package redis_test
 
 import (
 	"context"
+	"net/url"
 	"testing"
+	"time"
 
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/redis"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/test"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
+	"github.com/alexandreLamarre/dlock/pkg/test/container"
 	"github.com/alexandreLamarre/dlock/pkg/util/future"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	goredislib "github.com/redis/go-redis/v9"
 	"github.com/samber/lo"
 )
 
@@ -29,11 +33,39 @@ var _ = BeforeSuite(func() {
 	if Label("integration").MatchesLabelFilter(GinkgoLabelFilter()) {
 		env := test.Environment{}
 		Expect(env.Start()).To(Succeed())
+		ctx := context.Background()
+		ctxca, ca := context.WithCancel(ctx)
+		DeferCleanup(
+			func() {
+				ca()
+			},
+		)
+		By("verifying the redis container starts")
+		redisC, err := container.StartRedisContainer(ctxca)
+		Expect(err).NotTo(HaveOccurred())
+		redisUrl, err := url.Parse(redisC.URI)
+		Expect(err).NotTo(HaveOccurred())
+		conf := []*goredislib.Options{
+			{
+				Network: "tcp",
+				Addr:    redisUrl.Host,
+			},
+		}
 
-		conf, err := env.StartRedis()
 		GinkgoWriter.Write([]byte("started redis...."))
 		Expect(err).NotTo(HaveOccurred())
 		pools := redis.AcquireRedisPool(conf)
+
+		By("Verifying the redis pools are reachable from the clients")
+		for _, pool := range pools {
+			ctxca, ca := context.WithTimeout(ctx, 1*time.Second)
+			defer ca()
+			conn, err := pool.Get(ctxca)
+			Expect(err).NotTo(HaveOccurred())
+			defer conn.Close()
+			_, err = conn.Get("test")
+			Expect(err).NotTo(HaveOccurred())
+		}
 
 		lm := redis.NewLockManager(
 			context.Background(),
