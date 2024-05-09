@@ -43,6 +43,10 @@ var _ = BeforeSuite(func() {
 		By("verifying the redis container starts")
 		redisC, err := container.StartRedisContainer(ctxca)
 		Expect(err).NotTo(HaveOccurred())
+
+		DeferCleanup(func() {
+			redisC.Container.Terminate(ctx)
+		})
 		redisUrl, err := url.Parse(redisC.URI)
 		Expect(err).NotTo(HaveOccurred())
 		conf := []*goredislib.Options{
