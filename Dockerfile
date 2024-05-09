@@ -1,8 +1,9 @@
-FROM golang:1.22 as builder
+FROM golang:1.22.3-alpine3.19 as builder
 
 # Set destination for COPY
 WORKDIR /usr/src/app
 
+RUN apk add --no-cache make
 # Set up build dependencies
 RUN go install \
 github.com/bufbuild/buf/cmd/buf@v1.29.0
@@ -19,7 +20,7 @@ COPY . .
 # Build
 RUN make build
 
-FROM ubuntu:22.04
+FROM alpine:3.19
 
 COPY --from=builder /usr/src/app/bin/dlock /usr/local/bin/dlock
 COPY --from=builder /usr/src/app/bin/dlockctl /usr/local/bin/dlockctl
