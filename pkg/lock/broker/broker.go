@@ -3,8 +3,10 @@ package broker
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
@@ -45,6 +47,19 @@ func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
 			l.lg.With(logger.Err(err)).Warn("failed to acquired etcd client")
 			return nil, err
 		}
+		errs := []error{}
+		for _, endp := range l.config.EtcdClientSpec.Endpoints {
+			ctxT, caT := context.WithTimeout(ctx, 1*time.Second)
+			defer caT()
+			_, err := cli.Status(ctxT, endp)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+		if len(errs) > 0 {
+			return nil, errors.Join(errs...)
+		}
+		l.lg.Info("acquired etcd client")
 		return etcd.NewEtcdLockManager(cli, "lock", l.tracer, l.lg), nil
 	}
 
@@ -55,6 +70,7 @@ func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
 			l.lg.With(logger.Err(err)).Warn("failed to acquired jetstream client")
 			return nil, err
 		}
+		l.lg.Info("acquired jetstream client")
 		return jetstream.NewLockManager(ctx, cli, "lock", l.tracer, l.lg), nil
 	}
 
@@ -66,6 +82,8 @@ func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
 				Network: l.config.RedisClientSpec.Network,
 			},
 		})
+		// TODO : ping redis pool for health before starting
+		l.lg.Info("acquired redis client")
 		return redis.NewLockManager(ctx, "lock", cli, l.lg), nil
 	}
 	return nil, fmt.Errorf("unknown lock manager type in config : %s", util.Must(json.Marshal(l.config)))
