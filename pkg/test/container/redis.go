@@ -3,7 +3,6 @@ package container
 import (
 	"context"
 	"fmt"
-	"testing"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -16,7 +15,7 @@ type RedisContainer struct {
 
 func StartRedisContainer(ctx context.Context) (*RedisContainer, error) {
 	req := testcontainers.ContainerRequest{
-		Image:        "redis:6.2",
+		Image:        "redis:7.2",
 		ExposedPorts: []string{"6379/tcp"},
 		WaitingFor:   wait.ForLog("Ready to accept connections"),
 	}
@@ -42,13 +41,4 @@ func StartRedisContainer(ctx context.Context) (*RedisContainer, error) {
 		URI:       uri,
 	}, nil
 
-}
-
-func TestWithRedis(t *testing.T) {
-	ctx := context.Background()
-	redis, err := StartRedisContainer(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer redis.Container.Terminate(ctx)
 }
