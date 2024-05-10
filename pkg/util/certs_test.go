@@ -1,3 +1,5 @@
+//go:build !minimal
+
 package util_test
 
 import (

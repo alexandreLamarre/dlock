@@ -1,3 +1,5 @@
+//go:build !minimal
+
 package container
 
 import (
@@ -15,9 +17,11 @@ type RedisContainer struct {
 
 func StartRedisContainer(ctx context.Context) (*RedisContainer, error) {
 	req := testcontainers.ContainerRequest{
+		Name:         "redis-test",
 		Image:        "redis:7.2",
 		ExposedPorts: []string{"6379/tcp"},
-		WaitingFor:   wait.ForLog("Ready to accept connections"),
+		WaitingFor:   wait.ForExposedPort(),
+		// WaitingFor:   wait.ForLog("Ready to accept connections"),
 	}
 	redisC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,

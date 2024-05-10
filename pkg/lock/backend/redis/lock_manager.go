@@ -5,14 +5,35 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
+	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/go-redsync/redsync/v4/redis"
+	goredislib "github.com/redis/go-redis/v9"
 )
 
 var pingScript = redis.NewScript(0, `
 	local info = redis.call("INFO")
 	return info
 `)
+
+func init() {
+	broker.RegisterLockBroker(
+		constants.RedisLockManager,
+		func(ctx context.Context, l broker.LockBroker) (lock.LockManager, error) {
+			l.Lg.Info("acquiring redis client...")
+			cli := AcquireRedisPool([]*goredislib.Options{
+				{
+					Addr:    l.Config.RedisClientSpec.Addr,
+					Network: l.Config.RedisClientSpec.Network,
+				},
+			})
+			// TODO : ping redis pool for health before starting
+			l.Lg.Info("acquired redis client")
+			return NewLockManager(ctx, "lock", cli, l.Lg), nil
+		},
+	)
+}
 
 type LockManager struct {
 	ctx    context.Context

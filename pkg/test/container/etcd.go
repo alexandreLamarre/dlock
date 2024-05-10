@@ -1,3 +1,5 @@
+//go:build !minimal
+
 package container
 
 import (
@@ -18,9 +20,11 @@ func StartEtcdContainer(ctx context.Context) (*EtcdContainer, error) {
 	clientPort := 2379
 	node := "A"
 	req := testcontainers.ContainerRequest{
+		Name:         "etcd-test",
 		Image:        "quay.io/coreos/etcd:v3.5.12",
 		ExposedPorts: []string{"2379/tcp"},
-		WaitingFor:   wait.ForLog("ready to serve client requests"),
+		WaitingFor:   wait.ForExposedPort(),
+		// WaitingFor:   wait.ForLog("ready to serve client requests"),
 		Cmd: []string{
 			"etcd",
 			fmt.Sprintf("--name=%s", node),

@@ -1,3 +1,5 @@
+//go:build !minimal
+
 package container
 
 import (
@@ -15,10 +17,12 @@ type NatsContainer struct {
 
 func StartNatsContainer(ctx context.Context) (*NatsContainer, error) {
 	req := testcontainers.ContainerRequest{
-		Image:        "nats:2.10",
+		Name:         "nats-test",
+		Image:        "nats:2.10.14",
 		ExposedPorts: []string{"4222/tcp"},
-		WaitingFor:   wait.ForLog("Server is ready"),
-		Cmd:          []string{"-js"},
+		WaitingFor:   wait.ForExposedPort(),
+		// WaitingFor:   wait.ForLog("Server is ready"),
+		Cmd: []string{"-js"},
 	}
 	natsC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,

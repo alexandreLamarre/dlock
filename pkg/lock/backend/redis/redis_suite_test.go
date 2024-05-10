@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/redis"
+	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
 	"github.com/alexandreLamarre/dlock/pkg/test/container"
@@ -92,3 +94,12 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = Describe("Redis Lock Manager", Ordered, Label("integration", "slow"), integration.LockManagerTestSuite(lmF, lmSetF))
+var _ = Describe("Redis Broker", Label("unit"), func() {
+	When("we register the lock broker", func() {
+		It("should register the redis lock manager as a broker", func() {
+			rBroker, ok := broker.GetLockBroker(constants.RedisLockManager)
+			Expect(ok).To(BeTrue())
+			Expect(rBroker).NotTo(BeNil())
+		})
+	})
+})

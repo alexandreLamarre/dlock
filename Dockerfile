@@ -1,4 +1,5 @@
 FROM golang:1.22.3-alpine3.19 as builder
+ARG tags
 
 # Set destination for COPY
 WORKDIR /usr/src/app
@@ -17,8 +18,7 @@ RUN go mod download
 
 COPY . .
 
-# Build
-RUN make build
+RUN GO_BUILD_TAGS=${tags} make build
 
 FROM alpine:3.19
 
@@ -26,6 +26,7 @@ COPY --from=builder /usr/src/app/bin/dlock /usr/local/bin/dlock
 COPY --from=builder /usr/src/app/bin/dlockctl /usr/local/bin/dlockctl
 RUN export PATH=$PATH:/usr/local/bin/dlockctl
 RUN chmod +x /usr/local/bin/dlock
+RUN chmod +x /usr/local/bin/dlockctl
 
 EXPOSE 5055
 ENTRYPOINT ["dlock", "--addr", "tcp4://127.0.0.1:5055"]

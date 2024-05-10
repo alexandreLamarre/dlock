@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/etcd"
+	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
 	"github.com/alexandreLamarre/dlock/pkg/test/container"
@@ -93,3 +95,12 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = Describe("Etcd Lock Manager", Ordered, Label("integration", "slow"), integration.LockManagerTestSuite(lmF, lmSet))
+var _ = Describe("Etcd Broker", Label("unit"), func() {
+	When("we register the lock broker", func() {
+		It("should register the Etcd lock manager as a broker", func() {
+			eBroker, ok := broker.GetLockBroker(constants.EtcdLockManager)
+			Expect(ok).To(BeTrue())
+			Expect(eBroker).NotTo(BeNil())
+		})
+	})
+})
