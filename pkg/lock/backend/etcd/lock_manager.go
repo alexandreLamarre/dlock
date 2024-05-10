@@ -6,11 +6,42 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"time"
 
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
+	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
+	"github.com/alexandreLamarre/dlock/pkg/logger"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.opentelemetry.io/otel/trace"
 )
+
+func init() {
+	broker.RegisterLockBroker(
+		constants.EtcdLockManager,
+		func(ctx context.Context, l broker.LockBroker) (lock.LockManager, error) {
+			l.Lg.Info("acquiring etcd client...")
+			cli, err := NewEtcdClient(ctx, l.Config.EtcdClientSpec)
+			if err != nil {
+				l.Lg.With(logger.Err(err)).Warn("failed to acquired etcd client")
+				return nil, err
+			}
+			errs := []error{}
+			for _, endp := range l.Config.EtcdClientSpec.Endpoints {
+				ctxT, caT := context.WithTimeout(ctx, 1*time.Second)
+				defer caT()
+				_, err := cli.Status(ctxT, endp)
+				if err != nil {
+					errs = append(errs, err)
+				}
+			}
+			if len(errs) > 0 {
+				return nil, errors.Join(errs...)
+			}
+			l.Lg.Info("acquired etcd client")
+			return NewEtcdLockManager(cli, "lock", l.Tracer, l.Lg), nil
+		})
+}
 
 type EtcdLockManager struct {
 	client *clientv3.Client

@@ -3,26 +3,21 @@ package broker
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
-	"time"
+	"strings"
 
 	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
-	"github.com/alexandreLamarre/dlock/pkg/lock/backend/etcd"
-	"github.com/alexandreLamarre/dlock/pkg/lock/backend/jetstream"
-	"github.com/alexandreLamarre/dlock/pkg/lock/backend/redis"
-	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/util"
-	goredislib "github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type LockBroker struct {
-	lg     *slog.Logger
-	config *v1alpha1.LockServerConfig
-	tracer trace.Tracer
+	Lg     *slog.Logger
+	Config *v1alpha1.LockServerConfig
+	Tracer trace.Tracer
 }
 
 func NewLockBroker(
@@ -31,60 +26,39 @@ func NewLockBroker(
 	tracer trace.Tracer,
 ) LockBroker {
 	return LockBroker{
-		config: cfg,
-		lg:     lg,
-		tracer: tracer,
+		Config: cfg,
+		Lg:     lg,
+		Tracer: tracer,
 	}
 }
 
 // LockManager blocks until it acquires the client connection, or returns an error
 // when an unrecoverable error is hit
 func (l LockBroker) LockManager(ctx context.Context) (lock.LockManager, error) {
-	if l.config.EtcdClientSpec != nil {
-		l.lg.Info("acquiring etcd client...")
-		cli, err := etcd.NewEtcdClient(ctx, l.config.EtcdClientSpec)
-		if err != nil {
-			l.lg.With(logger.Err(err)).Warn("failed to acquired etcd client")
-			return nil, err
+	backends := strings.Join(brokerKeys(), ",")
+	l.Lg.Info(fmt.Sprintf("Available lock managers : %s", backends))
+	if l.Config.EtcdClientSpec != nil {
+		broker, ok := GetLockBroker(constants.EtcdLockManager)
+		if !ok {
+			return nil, fmt.Errorf("etcd lock manager not registered")
 		}
-		errs := []error{}
-		for _, endp := range l.config.EtcdClientSpec.Endpoints {
-			ctxT, caT := context.WithTimeout(ctx, 1*time.Second)
-			defer caT()
-			_, err := cli.Status(ctxT, endp)
-			if err != nil {
-				errs = append(errs, err)
-			}
+		return broker(ctx, l)
+	}
+	if l.Config.JetstreamClientSpec != nil {
+		broker, ok := GetLockBroker(constants.JetstreamLockManager)
+		if !ok {
+			return nil, fmt.Errorf("jetstream lock manager not registered")
 		}
-		if len(errs) > 0 {
-			return nil, errors.Join(errs...)
-		}
-		l.lg.Info("acquired etcd client")
-		return etcd.NewEtcdLockManager(cli, "lock", l.tracer, l.lg), nil
+		return broker(ctx, l)
 	}
 
-	if l.config.JetstreamClientSpec != nil {
-		l.lg.Info("acquiring jetstream client...")
-		cli, err := jetstream.AcquireJetstreamConn(ctx, l.config.JetstreamClientSpec, l.lg)
-		if err != nil {
-			l.lg.With(logger.Err(err)).Warn("failed to acquired jetstream client")
-			return nil, err
+	if l.Config.RedisClientSpec != nil {
+		broker, ok := GetLockBroker(constants.RedisLockManager)
+		if !ok {
+			return nil, fmt.Errorf("redis lock manager not registered")
 		}
-		l.lg.Info("acquired jetstream client")
-		return jetstream.NewLockManager(ctx, cli, "lock", l.tracer, l.lg), nil
+		return broker(ctx, l)
 	}
 
-	if l.config.RedisClientSpec != nil {
-		l.lg.Info("acquiring redis client...")
-		cli := redis.AcquireRedisPool([]*goredislib.Options{
-			{
-				Addr:    l.config.RedisClientSpec.Addr,
-				Network: l.config.RedisClientSpec.Network,
-			},
-		})
-		// TODO : ping redis pool for health before starting
-		l.lg.Info("acquired redis client")
-		return redis.NewLockManager(ctx, "lock", cli, l.lg), nil
-	}
-	return nil, fmt.Errorf("unknown lock manager type in config : %s", util.Must(json.Marshal(l.config)))
+	return nil, fmt.Errorf("unknown lock manager type in config : %s", util.Must(json.Marshal(l.Config)))
 }

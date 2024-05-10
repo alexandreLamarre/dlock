@@ -6,8 +6,10 @@ import (
 	"testing"
 
 	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/backend/jetstream"
+	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"
 	"github.com/alexandreLamarre/dlock/pkg/test/container"
@@ -94,3 +96,12 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = Describe("Jetstream Lock Manager", Ordered, Label("integration", "slow"), integration.LockManagerTestSuite(lmF, lmSetF))
+var _ = Describe("Jetstream Broker", Label("unit"), func() {
+	When("we register the lock broker", func() {
+		It("should register the jetstream lock manager as a broker", func() {
+			jBroker, ok := broker.GetLockBroker(constants.JetstreamLockManager)
+			Expect(ok).To(BeTrue())
+			Expect(jBroker).NotTo(BeNil())
+		})
+	})
+})

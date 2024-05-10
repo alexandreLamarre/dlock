@@ -4,10 +4,29 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
+	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
+	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/trace"
 )
+
+func init() {
+	broker.RegisterLockBroker(
+		constants.JetstreamLockManager,
+		func(ctx context.Context, l broker.LockBroker) (lock.LockManager, error) {
+			l.Lg.Info("acquiring jetstream client...")
+			cli, err := AcquireJetstreamConn(ctx, l.Config.JetstreamClientSpec, l.Lg)
+			if err != nil {
+				l.Lg.With(logger.Err(err)).Warn("failed to acquired jetstream client")
+				return nil, err
+			}
+			l.Lg.Info("acquired jetstream client")
+			return NewLockManager(ctx, cli, "lock", l.Tracer, l.Lg), nil
+		},
+	)
+}
 
 // Requires jetstream 2.9+
 type LockManager struct {

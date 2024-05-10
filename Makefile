@@ -2,7 +2,8 @@
 .PHONY: testbin
 
 GOCMD=go
-GO_BUILD_FLAGS=
+GO_BUILD_FLAGS=-v -tags "minimal redis"
+GO_TEST_FLAGS=-race -tags redis,etcd,nats
 GOBUILDSERVER=$(GOCMD) build $(GO_BUILD_FLAGS) -ldflags "-w -s" -o ./bin/dlock ./cmd/dlock 
 GOBUILDCLI=$(GOCMD) build $(GO_BUILD_FLAGS) -ldflags "-w -s" -o ./bin/dlockctl ./cmd/dlockctl
 GOOS=$(shell go env GOOS)
@@ -26,22 +27,9 @@ build: gen
 
 gen:
 	buf generate
+
 run: build
 	./bin/$(BINARY_NAME)
 
-testbin:
-	wget https://github.com/nats-io/nats-server/releases/download/$(NATS_VERSION)/$(NATS_BIN).tar.gz
-	tar -C ./testbin -zxvf $(NATS_BIN).tar.gz --strip-components=1 $(NATS_BIN)/nats-server 
-	rm $(NATS_BIN).tar.gz
-	wget https://github.com/etcd-io/etcd/releases/download/$(ETCD_VERSION)/$(ETCD_BIN).tar.gz
-	tar -C ./testbin -zxvf $(ETCD_BIN).tar.gz --strip-components=1 $(ETCD_BIN)/etcd 
-	rm $(ETCD_BIN).tar.gz
-	wget https://packages.redis.io/redis-stack/$(REDIS_BIN)
-	chmod +x $(REDIS_BIN)
-	mv $(REDIS_BIN) ./testbin/redis-server
-
-clean:
-	rm -rf ./bin
-	rm -rf ./testbin/*
-	rm $(NATS_BIN).tar.gz || true
-	rm $(ETCD_BIN).tar.gz || true
+test:
+	ginkgo $(GO_TEST_FLAGS) ./...
