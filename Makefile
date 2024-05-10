@@ -2,10 +2,20 @@
 .PHONY: testbin
 
 GOCMD=go
-GO_BUILD_FLAGS=-v -tags "minimal redis"
-GO_TEST_FLAGS=-race -tags redis,etcd,nats
-GOBUILDSERVER=$(GOCMD) build $(GO_BUILD_FLAGS) -ldflags "-w -s" -o ./bin/dlock ./cmd/dlock 
-GOBUILDCLI=$(GOCMD) build $(GO_BUILD_FLAGS) -ldflags "-w -s" -o ./bin/dlockctl ./cmd/dlockctl
+ifndef GO_BUILD_TAGS
+	GO_BUILD_TAGS=minimal,redis,etcd,nats
+endif
+GO_BUILD_FLAGS=-v -tags $(GO_BUILD_TAGS) -ldflags "-w -s"
+ifndef GO_TEST_TAGS
+	GO_TEST_TAGS=redis,etcd,nats
+endif
+GO_TEST_FLAGS=-race -tags $(GO_TEST_TAGS)
+ifdef COVER
+	GO_TEST_FLAGS=-coverprofile=cover.out -covermode=atomic -race -tags $(GO_TEST_TAGS)
+endif
+
+GOBUILDSERVER=$(GOCMD) build $(GO_BUILD_FLAGS) -o ./bin/dlock ./cmd/dlock
+GOBUILDCLI=$(GOCMD) build $(GO_BUILD_FLAGS) -o ./bin/dlockctl ./cmd/dlockctl
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 NATS_VERSION=v2.10.9
