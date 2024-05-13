@@ -7,7 +7,7 @@ replace google.golang.org/grpc => google.golang.org/grpc v1.63.2
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
 require (
-	github.com/BurntSushi/toml v0.3.1
+	github.com/BurntSushi/toml v0.4.1
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/google/uuid v1.6.0
 	github.com/jwalton/go-supportscolor v1.2.0
@@ -18,8 +18,8 @@ require (
 	github.com/onsi/gomega v1.33.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/redis/go-redis/v9 v9.5.1
-	github.com/redis/rueidis v1.0.36
-	github.com/redis/rueidis/rueidiscompat v1.0.36
+	github.com/redis/rueidis v1.0.37
+	github.com/redis/rueidis/rueidiscompat v1.0.37
 	github.com/samber/lo v1.39.0
 	github.com/samber/slog-multi v1.0.2
 	github.com/samber/slog-sampling v1.4.2
