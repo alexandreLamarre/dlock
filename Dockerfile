@@ -21,6 +21,9 @@ COPY . .
 RUN GO_BUILD_TAGS=${tags} make build
 
 FROM alpine:3.19
+LABEL org.opencontainers.image.source="https://github.com/alexandreLamarre/dlock"
+LABEL org.opencontainers.image.description="Reliable & scalable distributed locking, scheduling and synchronization"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 COPY --from=builder /usr/src/app/bin/dlock /usr/local/bin/dlock
 COPY --from=builder /usr/src/app/bin/dlockctl /usr/local/bin/dlockctl
