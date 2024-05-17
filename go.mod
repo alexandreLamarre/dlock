@@ -13,7 +13,7 @@ require (
 	github.com/jwalton/go-supportscolor v1.2.0
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
 	github.com/lestrrat-go/backoff/v2 v2.0.8
-	github.com/nats-io/nats.go v1.34.1
+	github.com/nats-io/nats.go v1.35.0
 	github.com/onsi/ginkgo/v2 v2.17.3
 	github.com/onsi/gomega v1.33.1
 	github.com/prometheus/client_golang v1.19.1
