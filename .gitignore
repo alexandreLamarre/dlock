@@ -23,6 +23,7 @@ go.work
 #output binaries
 bin/
 testbin/
+dist/
 
 # data directories
 

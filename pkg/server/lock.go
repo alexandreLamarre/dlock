@@ -18,6 +18,7 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/util"
+	"github.com/alexandreLamarre/dlock/pkg/version"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/attribute"
@@ -232,7 +233,7 @@ func (s *LockServer) ListenAndServe(ctx context.Context, addr string) error {
 	server.RegisterService(&v1alpha1.Dlock_ServiceDesc, s)
 	server.RegisterService(&healthv1.Health_ServiceDesc, s)
 	errC := lo.Async(func() error {
-		s.lg.With("addr", addr).Info("starting distributed lock server...")
+		s.lg.With("addr", addr).Info(fmt.Sprintf("starting distributed lock server version : %s...", version.FriendlyVersion()))
 		return server.Serve(listener)
 	})
 
