@@ -10,10 +10,20 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/server"
 	"github.com/alexandreLamarre/dlock/pkg/util"
+	"github.com/alexandreLamarre/dlock/pkg/version"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
+)
+
+var (
+	asciiLogo string = `
+	_____  __              __    
+	|     \|  |.-----.----.|  |--.
+	|  --  |  ||  _  |  __||    < 
+	|_____/|__||_____|____||__|__|
+	`
 )
 
 func main() {
@@ -51,7 +61,9 @@ func BuildRootCmd(tracer trace.Tracer) *cobra.Command {
 	var metricsAddr string
 	var logLevel string
 	cmd := &cobra.Command{
+		Version: version.FriendlyVersion(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Println(asciiLogo)
 			ctx, ca := context.WithCancelCause(cmd.Context())
 			if _, err := os.Stat(configPath); err != nil {
 				return err

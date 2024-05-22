@@ -15,6 +15,7 @@ import (
 	"github.com/alexandreLamarre/dlock/api/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
+	"github.com/alexandreLamarre/dlock/pkg/version"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -35,6 +36,7 @@ var (
 
 func BuildRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
+		Version: version.FriendlyVersion(),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			var err error
 			lg = logger.New()
