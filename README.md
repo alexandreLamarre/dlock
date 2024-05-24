@@ -2,6 +2,7 @@
 
 ![Build](https://github.com/alexandreLamarre/dlock/actions/workflows/ci.yaml/badge.svg)
 ![Release](https://img.shields.io/github/v/release/alexandreLamarre/dlock)
+[![License](https://img.shields.io/github/license/alexandreLamarre/dlock)](./LICENSE)
 
 Dlock is a server for distributed locking for process synchronization & exclusive transactions in distributed systems.
 
