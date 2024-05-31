@@ -17,16 +17,16 @@ require (
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
 	github.com/prometheus/client_golang v1.19.1
-	github.com/redis/go-redis/v9 v9.5.1
-	github.com/redis/rueidis v1.0.37
-	github.com/redis/rueidis/rueidiscompat v1.0.37
+	github.com/redis/go-redis/v9 v9.5.2
+	github.com/redis/rueidis v1.0.38
+	github.com/redis/rueidis/rueidiscompat v1.0.38
 	github.com/samber/lo v1.39.0
 	github.com/samber/slog-multi v1.0.3
 	github.com/samber/slog-sampling v1.4.2
 	github.com/spf13/cobra v1.8.0
 	github.com/testcontainers/testcontainers-go v0.31.0
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
-	go.etcd.io/etcd/client/v3 v3.5.13
+	go.etcd.io/etcd/client/v3 v3.5.14
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.52.0
 	go.opentelemetry.io/otel v1.27.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
@@ -102,8 +102,8 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.13 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.13 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.14 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.14 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.20.0 // indirect
 	go.uber.org/goleak v1.3.0 // indirect
