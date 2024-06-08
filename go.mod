@@ -17,12 +17,12 @@ require (
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
 	github.com/prometheus/client_golang v1.19.1
-	github.com/redis/go-redis/v9 v9.5.2
+	github.com/redis/go-redis/v9 v9.5.3
 	github.com/redis/rueidis v1.0.38
 	github.com/redis/rueidis/rueidiscompat v1.0.38
 	github.com/samber/lo v1.39.0
-	github.com/samber/slog-multi v1.0.3
-	github.com/samber/slog-sampling v1.4.2
+	github.com/samber/slog-multi v1.1.0
+	github.com/samber/slog-sampling v1.4.3
 	github.com/spf13/cobra v1.8.0
 	github.com/testcontainers/testcontainers-go v0.31.0
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
