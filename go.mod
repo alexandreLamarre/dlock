@@ -20,7 +20,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/redis/rueidis v1.0.40
 	github.com/redis/rueidis/rueidiscompat v1.0.40
-	github.com/samber/lo v1.42.0
+	github.com/samber/lo v1.44.0
 	github.com/samber/slog-multi v1.1.0
 	github.com/samber/slog-sampling v1.4.3
 	github.com/spf13/cobra v1.8.1
