@@ -15,7 +15,7 @@ require (
 	github.com/lestrrat-go/backoff/v2 v2.0.8
 	github.com/nats-io/nats.go v1.36.0
 	github.com/onsi/ginkgo/v2 v2.19.0
-	github.com/onsi/gomega v1.33.1
+	github.com/onsi/gomega v1.34.0
 	github.com/prometheus/client_golang v1.19.1
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/redis/rueidis v1.0.41
