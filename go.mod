@@ -14,12 +14,12 @@ require (
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
 	github.com/lestrrat-go/backoff/v2 v2.0.8
 	github.com/nats-io/nats.go v1.36.0
-	github.com/onsi/ginkgo/v2 v2.19.0
+	github.com/onsi/ginkgo/v2 v2.19.1
 	github.com/onsi/gomega v1.34.0
 	github.com/prometheus/client_golang v1.19.1
 	github.com/redis/go-redis/v9 v9.6.1
-	github.com/redis/rueidis v1.0.41
-	github.com/redis/rueidis/rueidiscompat v1.0.41
+	github.com/redis/rueidis v1.0.43
+	github.com/redis/rueidis/rueidiscompat v1.0.43
 	github.com/samber/lo v1.46.0
 	github.com/samber/slog-multi v1.2.0
 	github.com/samber/slog-sampling v1.5.0

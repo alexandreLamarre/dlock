@@ -155,6 +155,8 @@ github.com/onsi/ginkgo/v2 v2.17.3 h1:oJcvKpIb7/8uLpDDtnQuf18xVnwKp8DTD7DQ6gTd/MU
 github.com/onsi/ginkgo/v2 v2.17.3/go.mod h1:nP2DPOQoNsQmsVyv5rDA8JkXQoCs6goXIvr/PRJ1eCc=
 github.com/onsi/ginkgo/v2 v2.19.0 h1:9Cnnf7UHo57Hy3k6/m5k3dRfGTMXGvxhHFvkDTCTpvA=
 github.com/onsi/ginkgo/v2 v2.19.0/go.mod h1:rlwLi9PilAFJ8jCg9UE1QP6VBpd6/xj3SRC0d6TU0To=
+github.com/onsi/ginkgo/v2 v2.19.1 h1:QXgq3Z8Crl5EL1WBAC98A5sEBHARrAJNzAmMxzLcRF0=
+github.com/onsi/ginkgo/v2 v2.19.1/go.mod h1:O3DtEWQkPa/F7fBMgmZQKKsluAy8pd3rEQdrjkPb9zA=
 github.com/onsi/gomega v1.33.1 h1:dsYjIxxSR755MDmKVsaFQTE22ChNBcuuTWgkUDSubOk=
 github.com/onsi/gomega v1.33.1/go.mod h1:U4R44UsT+9eLIaYRB2a5qajjtQYn0hauxvRm16AVYg0=
 github.com/onsi/gomega v1.34.0 h1:eSSPsPNp6ZpsG8X1OVmOTxig+CblTc4AxpPBykhe2Os=
@@ -204,6 +206,8 @@ github.com/redis/rueidis v1.0.40 h1:zoC+GUTdNHhP7ZHrnMiIDcP16DUEVcxsPThQsvD7yDg=
 github.com/redis/rueidis v1.0.40/go.mod h1:bnbkk4+CkXZgDPEbUtSos/o55i4RhFYYesJ4DS2zmq0=
 github.com/redis/rueidis v1.0.41 h1:Ls5Dto11Tknh8CFbaMTSBD0fgMlTqJWq8/Df4LPaeQ0=
 github.com/redis/rueidis v1.0.41/go.mod h1:bnbkk4+CkXZgDPEbUtSos/o55i4RhFYYesJ4DS2zmq0=
+github.com/redis/rueidis v1.0.43 h1:wszWRYT+xf8FRmoPKW1nAgMMkhqioy2aZnxfFfWGw/A=
+github.com/redis/rueidis v1.0.43/go.mod h1:bnbkk4+CkXZgDPEbUtSos/o55i4RhFYYesJ4DS2zmq0=
 github.com/redis/rueidis/rueidiscompat v1.0.37 h1:YDV3B+zYnw08r/oH/WorvLnGb4wedC1Vou3gjnmk5qg=
 github.com/redis/rueidis/rueidiscompat v1.0.37/go.mod h1:vMyMT9TWeL9I4BEIhCODehEbrrnuEGuG6Zp4vJjWH94=
 github.com/redis/rueidis/rueidiscompat v1.0.38 h1:JREqnP+y4Gte4p66ZwBB2jT1m9W0RHFr+lRavpaGno4=
@@ -212,6 +216,8 @@ github.com/redis/rueidis/rueidiscompat v1.0.40 h1:N734YFg60iflPZCv3dBiMtXzBxNX8N
 github.com/redis/rueidis/rueidiscompat v1.0.40/go.mod h1:944WKtARDCqYQrcWdZVQbL121hC1VQJm7YVNurodVbg=
 github.com/redis/rueidis/rueidiscompat v1.0.41 h1:jfI53rVDH9trklTQY5R/jbGJpAcoabh+J5q6x+IZ0Uo=
 github.com/redis/rueidis/rueidiscompat v1.0.41/go.mod h1:x7By3oT8E/l+4SVKGXPA0r4el+4f9Ig7Ahet5y4QXbA=
+github.com/redis/rueidis/rueidiscompat v1.0.43 h1:VRGKEsOiASGMb1Vpa4xwsu0tdKLio7m4k4kStPfH820=
+github.com/redis/rueidis/rueidiscompat v1.0.43/go.mod h1:zqknjm1IvFHI+WHIxkdkfxyIaWdMN4+WaHB3ZSrV9YE=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
