@@ -1,4 +1,4 @@
-FROM golang:1.22.5-alpine3.19 as builder
+FROM golang:1.23.0-alpine3.19 as builder
 ARG tags
 
 # Set destination for COPY
