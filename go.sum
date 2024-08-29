@@ -228,6 +228,8 @@ github.com/redis/rueidis v1.0.43 h1:wszWRYT+xf8FRmoPKW1nAgMMkhqioy2aZnxfFfWGw/A=
 github.com/redis/rueidis v1.0.43/go.mod h1:bnbkk4+CkXZgDPEbUtSos/o55i4RhFYYesJ4DS2zmq0=
 github.com/redis/rueidis v1.0.44 h1:QfhfuovwEabcywfEXofRjPZuT29pjtpIWDJlCGHZfg8=
 github.com/redis/rueidis v1.0.44/go.mod h1:bnbkk4+CkXZgDPEbUtSos/o55i4RhFYYesJ4DS2zmq0=
+github.com/redis/rueidis v1.0.45 h1:j7hfcqfLLIqgTK3IkxBhXdeJcP34t3XLXvorDLqXfgM=
+github.com/redis/rueidis v1.0.45/go.mod h1:by+34b0cFXndxtYmPAHpoTHO5NkosDlBvhexoTURIxM=
 github.com/redis/rueidis/rueidiscompat v1.0.37 h1:YDV3B+zYnw08r/oH/WorvLnGb4wedC1Vou3gjnmk5qg=
 github.com/redis/rueidis/rueidiscompat v1.0.37/go.mod h1:vMyMT9TWeL9I4BEIhCODehEbrrnuEGuG6Zp4vJjWH94=
 github.com/redis/rueidis/rueidiscompat v1.0.38 h1:JREqnP+y4Gte4p66ZwBB2jT1m9W0RHFr+lRavpaGno4=
@@ -240,6 +242,8 @@ github.com/redis/rueidis/rueidiscompat v1.0.43 h1:VRGKEsOiASGMb1Vpa4xwsu0tdKLio7
 github.com/redis/rueidis/rueidiscompat v1.0.43/go.mod h1:zqknjm1IvFHI+WHIxkdkfxyIaWdMN4+WaHB3ZSrV9YE=
 github.com/redis/rueidis/rueidiscompat v1.0.44 h1:yA6Br9kvmPcBye17QoqZr57K41UFWvwBYsmDcvWREvs=
 github.com/redis/rueidis/rueidiscompat v1.0.44/go.mod h1:FX/zFWyczuHn+CRJ9hgEfqX6GP7vmVlZhy3EQvBSw7Y=
+github.com/redis/rueidis/rueidiscompat v1.0.45 h1:G+3HIaETgtwr6aL6BOTFCa2DfpPDhxqcoiDn8cvd5Ps=
+github.com/redis/rueidis/rueidiscompat v1.0.45/go.mod h1:JMw3cktmwNqsSl2npjcxrOfLa1L3rmj1Ox5aPHiDjOU=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
