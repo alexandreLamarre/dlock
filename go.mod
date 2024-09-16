@@ -18,8 +18,8 @@ require (
 	github.com/onsi/gomega v1.34.2
 	github.com/prometheus/client_golang v1.20.3
 	github.com/redis/go-redis/v9 v9.6.1
-	github.com/redis/rueidis v1.0.45
-	github.com/redis/rueidis/rueidiscompat v1.0.45
+	github.com/redis/rueidis v1.0.46
+	github.com/redis/rueidis/rueidiscompat v1.0.46
 	github.com/samber/lo v1.47.0
 	github.com/samber/slog-multi v1.2.1
 	github.com/samber/slog-sampling v1.5.0
