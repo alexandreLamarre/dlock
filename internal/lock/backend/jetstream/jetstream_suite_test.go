@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/alexandreLamarre/dlock/internal/lock/backend/jetstream"
 	"github.com/alexandreLamarre/dlock/pkg/config/v1alpha1"
 	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
-	"github.com/alexandreLamarre/dlock/pkg/lock/backend/jetstream"
 	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"

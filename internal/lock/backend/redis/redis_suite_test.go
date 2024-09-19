@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alexandreLamarre/dlock/internal/lock/backend/redis"
 	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
-	"github.com/alexandreLamarre/dlock/pkg/lock/backend/redis"
 	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
 	"github.com/alexandreLamarre/dlock/pkg/logger"
 	"github.com/alexandreLamarre/dlock/pkg/test/conformance/integration"

@@ -3,5 +3,5 @@
 package main
 
 import (
-	_ "github.com/alexandreLamarre/dlock/pkg/lock/backend/etcd"
+	_ "github.com/alexandreLamarre/dlock/internal/lock/backend/etcd"
 )
