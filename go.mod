@@ -2,7 +2,7 @@ module github.com/alexandreLamarre/dlock
 
 go 1.22.2
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.66.2
+replace google.golang.org/grpc => google.golang.org/grpc v1.67.0
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
@@ -21,7 +21,7 @@ require (
 	github.com/redis/rueidis v1.0.46
 	github.com/redis/rueidis/rueidiscompat v1.0.46
 	github.com/samber/lo v1.47.0
-	github.com/samber/slog-multi v1.2.1
+	github.com/samber/slog-multi v1.2.2
 	github.com/samber/slog-sampling v1.5.0
 	github.com/spf13/cobra v1.8.1
 	github.com/testcontainers/testcontainers-go v0.33.0
@@ -37,7 +37,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.30.0
 	go.opentelemetry.io/otel/trace v1.30.0
 	golang.org/x/sync v0.8.0
-	google.golang.org/grpc v1.66.2
+	google.golang.org/grpc v1.67.0
 	google.golang.org/protobuf v1.34.2
 )
 
@@ -122,7 +122,7 @@ require (
 	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240604185151-ef581f913117 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.5.1 // indirect
