@@ -2,7 +2,7 @@ module github.com/alexandreLamarre/dlock
 
 go 1.22.2
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.67.0
+replace google.golang.org/grpc => google.golang.org/grpc v1.67.1
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
@@ -18,11 +18,11 @@ require (
 	github.com/onsi/gomega v1.34.2
 	github.com/prometheus/client_golang v1.20.4
 	github.com/redis/go-redis/v9 v9.6.1
-	github.com/redis/rueidis v1.0.46
-	github.com/redis/rueidis/rueidiscompat v1.0.46
+	github.com/redis/rueidis v1.0.47
+	github.com/redis/rueidis/rueidiscompat v1.0.47
 	github.com/samber/lo v1.47.0
-	github.com/samber/slog-multi v1.2.2
-	github.com/samber/slog-sampling v1.5.0
+	github.com/samber/slog-multi v1.2.3
+	github.com/samber/slog-sampling v1.5.1
 	github.com/spf13/cobra v1.8.1
 	github.com/testcontainers/testcontainers-go v0.33.0
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
@@ -37,7 +37,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.30.0
 	go.opentelemetry.io/otel/trace v1.30.0
 	golang.org/x/sync v0.8.0
-	google.golang.org/grpc v1.67.0
+	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.34.2
 )
 
