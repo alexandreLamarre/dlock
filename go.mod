@@ -17,7 +17,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
 	github.com/prometheus/client_golang v1.20.5
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/redis/rueidis v1.0.47
 	github.com/redis/rueidis/rueidiscompat v1.0.47
 	github.com/samber/lo v1.47.0
