@@ -29,10 +29,10 @@ REDIS_VERSION=7.2.0
 REDIS_BIN=redis-stack-server-$(REDIS_VERSION)-v8-x86_64.AppImage
 
 install:
-	go install github.com/bufbuild/buf/cmd/buf@v1.29.0
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
-	go install github.com/onsi/ginkgo/v2/ginkgo
+	go install github.com/bufbuild/buf/cmd/buf@latest
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
 build: gen
 	CGO_ENABLED=0 $(GOBUILDSERVER) 
