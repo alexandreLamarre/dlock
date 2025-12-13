@@ -62,6 +62,10 @@ func (c *conn) SetNX(name string, value string, expiry time.Duration) (bool, err
 	return c.delegate.SetNX(c.ctx, name, value, expiry).Result()
 }
 
+func (c *conn) ScriptLoad(script *redis.Script) error {
+	panic("not implemented")
+}
+
 func (c *conn) PTTL(name string) (time.Duration, error) {
 	return c.delegate.PTTL(c.ctx, name).Result()
 }

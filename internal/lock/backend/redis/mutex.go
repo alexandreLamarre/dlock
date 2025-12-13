@@ -202,7 +202,7 @@ var deleteScript = redis.NewScript(1, `
 	else
 		return 0
 	end
-`)
+`, "")
 
 func (m *redisMutex) release(ctx context.Context, pool redis.Pool, value string) (bool, error) {
 	m.lg.With("fenced", m.uuid).Debug("release lock requested...")
@@ -225,7 +225,7 @@ var touchScript = redis.NewScript(1, `
 	else
 		return 0
 	end
-`)
+`, "")
 
 func (m *redisMutex) touch(ctx context.Context, pool redis.Pool, value string, _ /*expiry*/ int) (bool, error) {
 	conn, err := pool.Get(ctx)
