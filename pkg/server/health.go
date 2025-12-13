@@ -35,6 +35,18 @@ func (l *LockServer) Check(ctx context.Context, req *healthv1.HealthCheckRequest
 		)
 }
 
+func (l *LockServer) List(ctx context.Context, _ *healthv1.HealthListRequest) (*healthv1.HealthListResponse, error) {
+	ret, err := l.Check(ctx, &healthv1.HealthCheckRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return &healthv1.HealthListResponse{
+		Statuses: map[string]*healthv1.HealthCheckResponse{
+			"lock-manager": ret,
+		},
+	}, nil
+}
+
 func (l *LockServer) Watch(*healthv1.HealthCheckRequest, healthv1.Health_WatchServer) error {
 	return status.Error(codes.Unimplemented, "method Watch not implemented")
 }

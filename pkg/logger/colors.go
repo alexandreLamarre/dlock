@@ -7,6 +7,7 @@ import (
 	"github.com/ttacon/chalk"
 )
 
+//nolint:unused
 var colorEnabled = supportscolor.SupportsColor(
 	os.Stdout.Fd(),
 	supportscolor.SniffFlagsOption(false),

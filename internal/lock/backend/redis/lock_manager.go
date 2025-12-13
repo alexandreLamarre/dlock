@@ -15,7 +15,7 @@ import (
 var pingScript = redis.NewScript(0, `
 	local info = redis.call("INFO")
 	return info
-`)
+`, "")
 
 func init() {
 	broker.RegisterLockBroker(

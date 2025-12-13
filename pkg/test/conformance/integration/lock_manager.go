@@ -12,12 +12,16 @@ import (
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/util"
 	"github.com/alexandreLamarre/dlock/pkg/util/future"
+
+	//nolint:all
 	. "github.com/onsi/ginkgo/v2"
+	//nolint:all
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gmeasure"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/samber/lo"
+	"github.com/samber/lo/mutable"
 )
 
 func LockManagerTestSuite(
@@ -115,9 +119,9 @@ func LockManagerTestSuite(
 				num := 0
 				errs := make(chan error, 2*len(locks))
 				doneV := make(chan (<-chan struct{}), 2*len(locks))
-				lockOrder := lo.Shuffle(locks)
+				mutable.Shuffle(locks)
 				var wg sync.WaitGroup
-				for _, lock := range lockOrder {
+				for _, lock := range locks {
 					lock := lock
 					wg.Add(1)
 					go func() {
@@ -131,7 +135,7 @@ func LockManagerTestSuite(
 						doneV <- done
 					}()
 				}
-				for _, lock := range lockOrder {
+				for _, lock := range locks {
 					lock := lock
 					wg.Add(1)
 					go func() {

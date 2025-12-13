@@ -29,7 +29,7 @@ var (
 func main() {
 	ctx := context.Background()
 
-	tp := instrumentation.NewTracerProvider()
+	tp := instrumentation.NewTracerProvider(ctx)
 
 	// Handle shutdown properly so nothing leaks.
 	defer func() { _ = tp.Shutdown(ctx) }()
@@ -37,7 +37,10 @@ func main() {
 	otel.SetTracerProvider(tp)
 
 	tracer := tp.Tracer("dlock")
-	BuildRootCmd(tracer).Execute()
+	if err := BuildRootCmd(tracer).Execute(); err != nil {
+		slog.With("err", err).Error("failed to execute dlock cmd")
+		os.Exit(1)
+	}
 }
 
 func logLevelFromString(level string) slog.Level {
@@ -64,10 +67,10 @@ func BuildRootCmd(tracer trace.Tracer) *cobra.Command {
 		Version: version.FriendlyVersion(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.Println(asciiLogo)
-			ctx, ca := context.WithCancelCause(cmd.Context())
 			if _, err := os.Stat(configPath); err != nil {
 				return err
 			}
+			ctx, ca := context.WithCancelCause(cmd.Context())
 			metricsServer := instrumentation.NewMetricsServer(metricsAddr)
 			lockServer := server.NewLockServer(
 				cmd.Context(),
