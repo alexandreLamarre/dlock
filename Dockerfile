@@ -1,4 +1,4 @@
-FROM golang:1.23.4-alpine3.19 as builder
+FROM golang:1.25.5-alpine3.23 as builder
 ARG tags
 
 # Set destination for COPY
@@ -7,10 +7,10 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache make
 # Set up build dependencies
 RUN go install \
-github.com/bufbuild/buf/cmd/buf@v1.29.0
+github.com/bufbuild/buf/cmd/buf@latest
 
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 # Download Go modules
 COPY go.mod go.sum ./

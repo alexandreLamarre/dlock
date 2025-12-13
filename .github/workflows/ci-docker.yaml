@@ -1,0 +1,35 @@
+name: Build (docker)
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".gitignore"
+      - "CODEOWNERS"
+      - "LICENSE"
+      - "Makefile"
+env:
+  REGISTRY: ghcr.io
+    
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: "${{ github.repository_owner }}"
+      - name: Build image 
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.OWNER_LC }}/dlock:ci
+
