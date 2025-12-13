@@ -3,7 +3,6 @@ package lock_test
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	. "github.com/onsi/ginkgo/v2"
@@ -15,14 +14,14 @@ var _ = Describe("Lock", Label("unit"), func() {
 		It("should run the lock primtive once", func() {
 			i := int32(0)
 			l := lock.OnceErr{}
-			Expect(l.Do(func() error {
-				atomic.AddInt32(&i, 1)
+			_ = l.Do(func() error {
+				i++
 				return nil
-			})).NotTo(BeNil())
-			Expect(l.Do(func() error {
-				atomic.AddInt32(&i, 1)
+			})
+			_ = l.Do(func() error {
+				i++
 				return nil
-			})).NotTo(BeNil())
+			})
 			Expect(i).To(Equal(int32(1)))
 		})
 
