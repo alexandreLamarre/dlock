@@ -44,7 +44,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		DeferCleanup(func() {
-			etcdC.Container.Terminate(ctx)
+			_ = etcdC.Container.Terminate(ctx)
 		})
 		etcdUrl, err := url.Parse(etcdC.URI)
 		Expect(err).NotTo(HaveOccurred())

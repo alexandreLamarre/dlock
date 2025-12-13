@@ -15,14 +15,14 @@ var _ = Describe("Lock", Label("unit"), func() {
 		It("should run the lock primtive once", func() {
 			i := int32(0)
 			l := lock.OnceErr{}
-			l.Do(func() error {
+			Expect(l.Do(func() error {
 				atomic.AddInt32(&i, 1)
 				return nil
-			})
-			l.Do(func() error {
+			})).NotTo(BeNil())
+			Expect(l.Do(func() error {
 				atomic.AddInt32(&i, 1)
 				return nil
-			})
+			})).NotTo(BeNil())
 			Expect(i).To(Equal(int32(1)))
 		})
 

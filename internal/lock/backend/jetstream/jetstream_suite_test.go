@@ -39,7 +39,7 @@ var _ = BeforeSuite(func() {
 		natsC, err := container.StartNatsContainer(ctxca)
 		Expect(err).To(Succeed())
 		DeferCleanup(func() {
-			natsC.Container.Terminate(ctxca)
+			_ = natsC.Container.Terminate(ctxca)
 		})
 
 		natsUrl, err := url.Parse(natsC.URI)

@@ -148,7 +148,7 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 			lg.With(logger.Err(err)).Error("failed to acquire lock")
 			lockSpan.RecordError(err)
 			lockSpan.End()
-			return status.Errorf(codes.Internal, err.Error())
+			return status.Errorf(codes.Internal, "%s", err.Error())
 		}
 		expiredC = expired
 		if !acquired {
@@ -168,14 +168,16 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 			lg.With(logger.Err(err)).Error("failed to acquire blocking lock", "key", in.Key)
 			lockSpan.RecordError(err)
 			lockSpan.End()
-			return status.Errorf(codes.Internal, err.Error())
+			return status.Errorf(codes.Internal, "%s", err.Error())
 		}
 		expiredC = expired
 	}
 	lockSpan.End()
 	defer func() {
 		lg.Debug("unlocking key")
-		locker.Unlock()
+		if err := locker.Unlock(); err != nil {
+			s.lg.Error("failed to unlock lock")
+		}
 	}()
 	LockAcquisitionCount.Add(stream.Context(), 1)
 	lockHoldStart := time.Now()

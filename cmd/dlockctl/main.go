@@ -25,7 +25,9 @@ import (
 )
 
 func main() {
-	BuildRootCmd().Execute()
+	if err := BuildRootCmd().Execute(); err != nil {
+		slog.With("err", err).Error("failed to executed dlockctl command")
+	}
 }
 
 var (
@@ -209,7 +211,7 @@ func setupConn(remoteAddr string) (*grpc.ClientConn, error) {
 	if err != nil {
 		return nil, err
 	}
-	conn, err := grpc.Dial(remoteUrl.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(remoteUrl.Host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return conn, err
 	}

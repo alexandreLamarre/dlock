@@ -37,7 +37,7 @@ type LoggerOptions struct {
 
 func ParseLevel(lvl string) slog.Level {
 	l := &slog.LevelVar{}
-	l.UnmarshalText([]byte(lvl))
+	_ = l.UnmarshalText([]byte(lvl))
 	return l.Level()
 }
 

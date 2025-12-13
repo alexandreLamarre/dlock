@@ -44,7 +44,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		DeferCleanup(func() {
-			redisC.Container.Terminate(ctx)
+			_ = redisC.Container.Terminate(ctx)
 		})
 		redisUrl, err := url.Parse(redisC.URI)
 		Expect(err).NotTo(HaveOccurred())
@@ -55,7 +55,7 @@ var _ = BeforeSuite(func() {
 			},
 		}
 
-		GinkgoWriter.Write([]byte("started redis...."))
+		_, _ = GinkgoWriter.Write([]byte("started redis...."))
 		Expect(err).NotTo(HaveOccurred())
 		pools := redis.AcquireRedisPool(conf)
 
@@ -65,7 +65,9 @@ var _ = BeforeSuite(func() {
 			defer ca()
 			conn, err := pool.Get(ctxca)
 			Expect(err).NotTo(HaveOccurred())
-			defer conn.Close()
+			defer func() {
+				_ = conn.Close()
+			}()
 			_, err = conn.Get("test")
 			Expect(err).NotTo(HaveOccurred())
 		}

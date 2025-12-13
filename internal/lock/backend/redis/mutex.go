@@ -108,7 +108,11 @@ func (m *redisMutex) acquire(ctx context.Context, pool redis.Pool, value string)
 	if err != nil {
 		return false, err
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.lg.With("err", err).Error("failed to close redis connection, potential connection leak")
+		}
+	}()
 	reply, err := conn.SetNX(m.key(), value, LockExpiry)
 	if err != nil {
 		m.lg.With("fenced", value).Error("failed to acquire lock", logger.Err(err))
@@ -146,13 +150,15 @@ func (m *redisMutex) lock(ctx context.Context) (<-chan struct{}, error) {
 
 	m.lg.Debug("lock not acquired, or lock acquired but already timed out")
 	// otherwise, lock should already be expired, due to latency in the system
-	func() (int, error) {
+	if _, err := func() (int, error) {
 		ctx, ca := context.WithTimeout(ctx, LockExpiry)
 		defer ca()
 		return m.actOnPoolsAsync(func(pool redis.Pool) (bool, error) {
 			return m.release(ctx, pool, uuid)
 		})
-	}()
+	}(); err != nil {
+		m.lg.With("err", err).Error("failed to release lock")
+	}
 
 	return expiredC, lockErr
 }
@@ -210,7 +216,11 @@ func (m *redisMutex) release(ctx context.Context, pool redis.Pool, value string)
 	if err != nil {
 		return false, err
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.lg.With("err", err).Error("failed to close redis connection, potential connection leak")
+		}
+	}()
 	status, err := conn.Eval(deleteScript, m.key(), value)
 	if err != nil {
 		return false, err
@@ -232,7 +242,11 @@ func (m *redisMutex) touch(ctx context.Context, pool redis.Pool, value string, _
 	if err != nil {
 		return false, nil
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.lg.With("err", err).Error("failed to close redis connection, potential connection leak")
+		}
+	}()
 	status, err := conn.Eval(touchScript, m.key(), value)
 	if err != nil {
 		return false, err

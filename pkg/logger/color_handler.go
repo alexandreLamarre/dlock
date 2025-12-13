@@ -131,10 +131,10 @@ func (h *colorHandler) Handle(_ context.Context, r slog.Record) error {
 
 	if rep == nil {
 		h.appendLevel(buf, r.Level)
-		buf.WriteByte(' ')
+		_ = buf.WriteByte(' ')
 	} else if a := rep(nil /* groups */, slog.Any(slog.LevelKey, r.Level)); a.Key != "" {
 		h.appendValue(buf, a.Value, false)
-		buf.WriteByte(' ')
+		_ = buf.WriteByte(' ')
 	}
 
 	if !h.omitLoggerName {
@@ -149,7 +149,7 @@ func (h *colorHandler) Handle(_ context.Context, r slog.Record) error {
 
 	// write handler attributes
 	if len(h.attrsPrefix) > 0 {
-		buf.WriteString(h.attrsPrefix)
+		_, _ = buf.WriteString(h.attrsPrefix)
 	}
 
 	// write attributes
@@ -173,39 +173,39 @@ func (h *colorHandler) Handle(_ context.Context, r slog.Record) error {
 }
 
 func (h *colorHandler) appendTime(buf *buffer, t time.Time) {
-	buf.WriteStringIf(h.colorEnabled, ansiFaintStyle)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiFaintStyle)
 	if h.replaceAttr == nil {
 		*buf = t.AppendFormat(*buf, h.timeFormat)
-		buf.WriteByte(' ')
+		_ = buf.WriteByte(' ')
 	} else if a := h.replaceAttr(nil /* groups */, slog.Time(slog.TimeKey, t)); a.Key != "" {
 		h.appendValue(buf, a.Value, false)
-		buf.WriteByte(' ')
+		_ = buf.WriteByte(' ')
 	}
-	buf.WriteStringIf(h.colorEnabled, ansiReset)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 }
 
 func (h *colorHandler) appendLevel(buf *buffer, level slog.Level) {
 	switch {
 	case level < slog.LevelInfo:
-		buf.WriteStringIf(h.colorEnabled, ansiBrightMagenta)
-		buf.WriteString("DEBUG")
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightMagenta)
+		_, _ = buf.WriteString("DEBUG")
 		appendLevelDelta(buf, level-slog.LevelDebug)
-		buf.WriteStringIf(h.colorEnabled, ansiReset)
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 	case level < slog.LevelWarn:
-		buf.WriteStringIf(h.colorEnabled, ansiBrightBlue)
-		buf.WriteString("INFO")
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightBlue)
+		_, _ = buf.WriteString("INFO")
 		appendLevelDelta(buf, level-slog.LevelInfo)
-		buf.WriteStringIf(h.colorEnabled, ansiReset)
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 	case level < slog.LevelError:
-		buf.WriteStringIf(h.colorEnabled, ansiBrightYellow)
-		buf.WriteString("WARN")
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightYellow)
+		_, _ = buf.WriteString("WARN")
 		appendLevelDelta(buf, level-slog.LevelWarn)
-		buf.WriteStringIf(h.colorEnabled, ansiReset)
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 	default:
-		buf.WriteStringIf(h.colorEnabled, ansiBrightRed)
-		buf.WriteString("ERROR")
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightRed)
+		_, _ = buf.WriteString("ERROR")
 		appendLevelDelta(buf, level-slog.LevelError)
-		buf.WriteStringIf(h.colorEnabled, ansiReset)
+		_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 	}
 
 }
@@ -214,7 +214,7 @@ func appendLevelDelta(buf *buffer, delta slog.Level) {
 	if delta == 0 {
 		return
 	} else if delta > 0 {
-		buf.WriteByte('+')
+		_ = buf.WriteByte('+')
 	}
 	*buf = strconv.AppendInt(*buf, int64(delta), 10)
 }
@@ -224,19 +224,19 @@ func (h *colorHandler) writeGroups(buf *buffer) {
 	for i, group := range h.groups {
 		if i == 0 {
 			if group == pluginGroupPrefix {
-				buf.WriteStringIf(h.colorEnabled, ansiBrightCyan)
+				_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightCyan)
 			} else {
-				buf.WriteStringIf(h.colorEnabled, ansiBrightGreen)
+				_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightGreen)
 			}
 		}
-		buf.WriteString(group)
+		_, _ = buf.WriteString(group)
 		if i < last {
-			buf.WriteByte('.')
+			_ = buf.WriteByte('.')
 		} else {
-			buf.WriteByte(' ')
+			_ = buf.WriteByte(' ')
 		}
 	}
-	buf.WriteStringIf(h.colorEnabled, ansiReset)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 }
 
 func (h *colorHandler) writeSource(buf *buffer, pc uintptr) {
@@ -245,14 +245,14 @@ func (h *colorHandler) writeSource(buf *buffer, pc uintptr) {
 	if f.File != "" {
 		if h.replaceAttr == nil {
 			h.appendSource(buf, f.File, f.Line)
-			buf.WriteByte(' ')
+			_ = buf.WriteByte(' ')
 		} else if a := h.replaceAttr(nil /* groups */, slog.Any(slog.SourceKey, &slog.Source{
 			Function: f.Function,
 			File:     f.File,
 			Line:     f.Line,
 		})); a.Key != "" {
 			h.appendValue(buf, a.Value, false)
-			buf.WriteByte(' ')
+			_ = buf.WriteByte(' ')
 		}
 	}
 }
@@ -260,22 +260,22 @@ func (h *colorHandler) writeSource(buf *buffer, pc uintptr) {
 func (h *colorHandler) appendSource(buf *buffer, file string, line int) {
 	dir, file := filepath.Split(file)
 
-	buf.WriteStringIf(h.colorEnabled, ansiFaintStyle)
-	buf.WriteString(filepath.Base(dir))
-	buf.WriteByte('/')
-	buf.WriteString(file)
-	buf.WriteByte(':')
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiFaintStyle)
+	_, _ = buf.WriteString(filepath.Base(dir))
+	_ = buf.WriteByte('/')
+	_, _ = buf.WriteString(file)
+	_ = buf.WriteByte(':')
 	*buf = strconv.AppendInt(*buf, int64(line), 10)
-	buf.WriteStringIf(h.colorEnabled, ansiResetFaintStyle)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiResetFaintStyle)
 }
 
 func (h *colorHandler) writeMessage(buf *buffer, msg string) {
 	if h.replaceAttr == nil {
-		buf.WriteString(msg)
-		buf.WriteByte(' ')
+		_, _ = buf.WriteString(msg)
+		_ = buf.WriteByte(' ')
 	} else if a := h.replaceAttr(nil /* groups */, slog.String(slog.MessageKey, msg)); a.Key != "" {
 		h.appendValue(buf, a.Value, false)
-		buf.WriteByte(' ')
+		_ = buf.WriteByte(' ')
 	}
 }
 
@@ -296,22 +296,22 @@ func (h *colorHandler) appendAttr(buf *buffer, attr slog.Attr, groupsPrefix stri
 	case slog.KindAny:
 		if e, ok := attr.Value.Any().(noAllocErr); ok {
 			h.appendErr(buf, e)
-			buf.WriteByte(' ')
+			_ = buf.WriteByte(' ')
 			break
 		}
 		fallthrough
 	default:
 		h.appendKey(buf, attr.Key)
 		h.appendValue(buf, attr.Value, true)
-		buf.WriteByte(' ')
+		_ = buf.WriteByte(' ')
 	}
 }
 
 func (h *colorHandler) appendKey(buf *buffer, key string) {
-	buf.WriteStringIf(h.colorEnabled, ansiFaintStyle)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiFaintStyle)
 	h.appendString(buf, key, true)
-	buf.WriteByte('=')
-	buf.WriteStringIf(h.colorEnabled, ansiReset)
+	_ = buf.WriteByte('=')
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 }
 
 func (h *colorHandler) appendValue(buf *buffer, v slog.Value, shouldQuote bool) {
@@ -349,19 +349,19 @@ func (h *colorHandler) appendValue(buf *buffer, v slog.Value, shouldQuote bool) 
 }
 
 func (h *colorHandler) appendErr(buf *buffer, err error) {
-	buf.WriteStringIf(h.colorEnabled, ansiBrightRedFaint)
-	buf.WriteString(errKey)
-	buf.WriteByte('=')
-	buf.WriteStringIf(h.colorEnabled, ansiResetFaintStyle)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiBrightRedFaint)
+	_, _ = buf.WriteString(errKey)
+	_ = buf.WriteByte('=')
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiResetFaintStyle)
 	h.appendString(buf, err.Error(), true)
-	buf.WriteStringIf(h.colorEnabled, ansiReset)
+	_, _ = buf.WriteStringIf(h.colorEnabled, ansiReset)
 }
 
 func (h *colorHandler) appendString(buf *buffer, s string, shouldQuote bool) {
 	if shouldQuote && needsQuoting(s) {
 		*buf = strconv.AppendQuote(*buf, s)
 	} else {
-		buf.WriteString(s)
+		_, _ = buf.WriteString(s)
 	}
 }
 
