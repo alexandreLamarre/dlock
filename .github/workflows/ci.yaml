@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@4aaadf42668403795cdfdb15b1c4250e9fed12b9
+      - uses: actions/setup-go@ae252ee6fb24babc50e89fc67c4aa608e69fbf8f
         with:
           go-version-file: .tool-versions
       - name: Install dev binaries
