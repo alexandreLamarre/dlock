@@ -2,7 +2,7 @@ module github.com/alexandreLamarre/dlock
 
 go 1.24.9
 
-toolchain go1.25.5
+toolchain go1.25.6
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.78.0
 
