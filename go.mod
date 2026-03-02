@@ -10,19 +10,19 @@ replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.c
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	github.com/go-redsync/redsync/v4 v4.15.0
+	github.com/go-redsync/redsync/v4 v4.16.0
 	github.com/google/uuid v1.6.0
 	github.com/jwalton/go-supportscolor v1.2.0
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
 	github.com/lestrrat-go/backoff/v2 v2.0.8
-	github.com/nats-io/nats.go v1.48.0
+	github.com/nats-io/nats.go v1.49.0
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/redis/rueidis v1.0.72
 	github.com/redis/rueidis/rueidiscompat v1.0.72
-	github.com/samber/lo v1.52.0
+	github.com/samber/lo v1.53.0
 	github.com/samber/slog-multi v1.7.1
 	github.com/samber/slog-sampling v1.5.5
 	github.com/spf13/cobra v1.10.2
@@ -79,7 +79,7 @@ require (
 	github.com/google/pprof v0.0.0-20260115054156-294ebfa9ad83 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.10 // indirect
@@ -92,7 +92,7 @@ require (
 	github.com/moby/term v0.5.0 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nats-io/nkeys v0.4.11 // indirect
+	github.com/nats-io/nkeys v0.4.12 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
