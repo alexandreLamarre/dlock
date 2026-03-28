@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/alexandreLamarre/dlock/internal/lock/backend/unimplemented"
 	"github.com/alexandreLamarre/dlock/pkg/constants"
 	"github.com/alexandreLamarre/dlock/pkg/lock"
 	"github.com/alexandreLamarre/dlock/pkg/lock/broker"
@@ -83,4 +84,24 @@ func (lm *LockManager) NewLock(key string, opt ...lock.LockOption) lock.Lock {
 	options := lock.DefaultLockOptions()
 	options.Apply(opt...)
 	return NewLock(lm.pools, lm.quorum, lm.prefix, key, lm.lg, options)
+}
+
+func (lm *LockManager) EXLock(key string, opts ...lock.LockOption) lock.Lock {
+	return lm.NewLock(key, opts...)
+}
+
+func (lm *LockManager) PWLock(key string, opts ...lock.LockOption) lock.Lock {
+	return &unimplemented.UnimplementedLock{}
+}
+
+func (lm *LockManager) PRLock(key string, opts ...lock.LockOption) lock.Lock {
+	return &unimplemented.UnimplementedLock{}
+}
+
+func (lm *LockManager) CWLock(key string, opts ...lock.LockOption) lock.Lock {
+	return &unimplemented.UnimplementedLock{}
+}
+
+func (lm *LockManager) CRLock(key string, opts ...lock.LockOption) lock.Lock {
+	return &unimplemented.UnimplementedLock{}
 }
