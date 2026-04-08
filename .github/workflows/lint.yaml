@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
         with:
           go-version-file: .tool-versions
-      - uses: golangci/golangci-lint-action@2d7e7b678591ee3321638e5c5621ca689628daa4
+      - uses: golangci/golangci-lint-action@46c9287ccb5fd9a896cb5705a7012084e34f6736
         with:
           version-file: .tool-versions
           args: --timeout=10m
