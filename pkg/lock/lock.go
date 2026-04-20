@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	ErrLockActionRequested = errors.New("lock action already requested")
-	ErrLockScheduled       = errors.New("nothing scheduled")
+	ErrLockActionRequested    = errors.New("lock action already requested")
+	ErrLockScheduled          = errors.New("nothing scheduled")
+	ErrLockTypeNotImplemented = errors.New("lock type not implemented")
 )
 
 var (
@@ -20,6 +21,28 @@ var (
 	DefaultAcquireTimeout = 100 * time.Millisecond
 	DefaultTimeout        = 10 * time.Second
 )
+
+type DistributedLock interface {
+	// EXLock is an exclusive lock that holds a mutually exclusive lock, much
+	// like a regular sync.Mutex but in a distributed manner
+	EXLock(key string, opts ...LockOption) Lock
+	// PWLock is a protected write lock that allows concurrent readers,
+	// but otherwise behaves like an exclusive lock. Can be paired with
+	// a protected read lock to behave like a sync.RWMutex
+	PWLock(key string, opts ...LockOption) Lock
+	// PRLock is a protected read lock that allows concurrent readers and
+	// prevents writers from acquiring the lock. Can be paired with a
+	// protected write lock to behave like a sync.RWMutex
+	PRLock(key string, opts ...LockOption) Lock
+	// CWLock is a concurrent write lock that allows multiple writers to
+	// acquire the lock, but cannot bypass exclusive locks or protected
+	// read/write operations
+	CWLock(key string, opts ...LockOption) Lock
+	// CRLock is a concurrent read lock that allows multiple readers to
+	// acquire the lock and allows bypass protected operations to read
+	// resources
+	CRLock(key string, opts ...LockOption) Lock
+}
 
 // Lock is a distributed lock that can be used to coordinate access to a resource or interest in
 // such a resource.
@@ -48,14 +71,11 @@ type Lock interface {
 
 // LockManager is a factory for Lock instances
 type LockManager interface {
+	DistributedLock
+
 	// Checks the health of the LockManager backend, conditions are a list of opaque
 	// issues that may be present in the backend.
 	Health(ctx context.Context) (conditions []string, err error)
-
-	// Instantiates a new Lock instance for the given key, with the given options.
-	//
-	// Defaults to lock.DefaultOptions if no options are provided.
-	NewLock(key string, opts ...LockOption) Lock
 }
 
 type LockScheduler struct {
