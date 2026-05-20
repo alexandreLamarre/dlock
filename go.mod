@@ -4,7 +4,7 @@ go 1.25.0
 
 toolchain go1.26.3
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.81.0
+replace google.golang.org/grpc => google.golang.org/grpc v1.81.1
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
@@ -16,12 +16,12 @@ require (
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
 	github.com/lestrrat-go/backoff/v2 v2.0.8
 	github.com/nats-io/nats.go v1.52.0
-	github.com/onsi/ginkgo/v2 v2.28.3
-	github.com/onsi/gomega v1.40.0
+	github.com/onsi/ginkgo/v2 v2.29.0
+	github.com/onsi/gomega v1.41.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.19.0
-	github.com/redis/rueidis v1.0.74
-	github.com/redis/rueidis/rueidiscompat v1.0.74
+	github.com/redis/rueidis v1.0.75
+	github.com/redis/rueidis/rueidiscompat v1.0.75
 	github.com/samber/lo v1.53.0
 	github.com/samber/slog-multi v1.8.0
 	github.com/samber/slog-sampling v1.6.0
@@ -39,7 +39,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.43.0
 	go.opentelemetry.io/otel/trace v1.43.0
 	golang.org/x/sync v0.20.0
-	google.golang.org/grpc v1.81.0
+	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 )
 
