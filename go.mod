@@ -2,7 +2,7 @@ module github.com/alexandreLamarre/dlock
 
 go 1.25.0
 
-toolchain go1.26.3
+toolchain go1.26.4
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.81.1
 
@@ -16,10 +16,10 @@ require (
 	github.com/kralicky/gpkg v0.0.0-20240119195700-64f32830b14f
 	github.com/lestrrat-go/backoff/v2 v2.0.8
 	github.com/nats-io/nats.go v1.52.0
-	github.com/onsi/ginkgo/v2 v2.29.0
+	github.com/onsi/ginkgo/v2 v2.30.0
 	github.com/onsi/gomega v1.41.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/redis/go-redis/v9 v9.20.0
+	github.com/redis/go-redis/v9 v9.20.1
 	github.com/redis/rueidis v1.0.75
 	github.com/redis/rueidis/rueidiscompat v1.0.75
 	github.com/samber/lo v1.53.0
@@ -38,7 +38,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.44.0
 	go.opentelemetry.io/otel/sdk/metric v1.44.0
 	go.opentelemetry.io/otel/trace v1.44.0
-	golang.org/x/sync v0.20.0
+	golang.org/x/sync v0.21.0
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 )
