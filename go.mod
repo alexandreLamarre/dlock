@@ -4,7 +4,7 @@ go 1.26
 
 toolchain go1.26.5
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.82.0
+replace google.golang.org/grpc => google.golang.org/grpc v1.82.1
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
@@ -18,7 +18,7 @@ require (
 	github.com/nats-io/nats.go v1.52.0
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
-	github.com/prometheus/client_golang v1.23.2
+	github.com/prometheus/client_golang v1.24.0
 	github.com/redis/go-redis/v9 v9.21.0
 	github.com/redis/rueidis v1.0.76
 	github.com/redis/rueidis/rueidiscompat v1.0.76
@@ -39,7 +39,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.44.0
 	go.opentelemetry.io/otel/trace v1.44.0
 	golang.org/x/sync v0.22.0
-	google.golang.org/grpc v1.82.0
+	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 )
 
@@ -79,7 +79,7 @@ require (
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/klauspost/compress v1.18.5 // indirect
+	github.com/klauspost/compress v1.19.0 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.10 // indirect
@@ -102,9 +102,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.67.5 // indirect
+	github.com/prometheus/common v0.70.0 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
-	github.com/prometheus/procfs v0.20.1 // indirect
+	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/samber/slog-common v0.21.0 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.5 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
@@ -127,7 +127,7 @@ require (
 	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/mod v0.36.0 // indirect
 	golang.org/x/net v0.56.0 // indirect
-	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.44.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
