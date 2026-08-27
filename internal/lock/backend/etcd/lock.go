@@ -21,7 +21,11 @@ type EtcdLock struct {
 	options *lock.LockOptions
 
 	scheduler *lock.LockScheduler
-
+	// !! Cannot reuse *concurrency.Session across multiple locks since it will break liveliness guarantee A
+	// locks will share their sessions and therefore keepalives will be sent for all locks, not just a specific lock.
+	// In the current implementation sessions are forcibly orphaned when the non-blocking call to unlock is
+	// made so we cannot re-use sessions in that case either -- since the session  will be orphaned for all locks
+	// if the session is re-used.
 	client *clientv3.Client
 	mutex  *etcdMutex
 }

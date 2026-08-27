@@ -130,7 +130,7 @@ func (s *LockServer) Lock(in *v1alpha1.LockRequest, stream v1alpha1.Dlock_LockSe
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	locker := s.lm.NewLock(in.Key, lock.WithTracer(s.tracer))
+	locker := s.lm.EXLock(in.Key, lock.WithTracer(s.tracer))
 	ctx, lockSpan := s.tracer.Start(stream.Context(), "acquire-lock", trace.WithAttributes(
 		attribute.KeyValue{
 			Key:   "key",
