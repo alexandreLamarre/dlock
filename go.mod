@@ -4,7 +4,7 @@ go 1.26
 
 toolchain go1.26.5
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.83.0
+replace google.golang.org/grpc => google.golang.org/grpc v1.83.1
 
 replace github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203 => github.com/alexandreLamarre/tempredis v0.0.0-20240129193023-7f411f64c2c7
 
@@ -39,7 +39,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.45.0
 	go.opentelemetry.io/otel/trace v1.45.0
 	golang.org/x/sync v0.22.0
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.11
 )
 
